@@ -21,22 +21,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-void send_status(struct gss_account account, char *msg)
+void delete_status_by_id(struct gss_account account, int id)
 {
 	char url[100];
-	sprintf(url, "%s://%s/api/statuses/update.xml", account.protocol, account.server);
+	sprintf(url, "%s://%s/api/statuses/destroy.xml", account.protocol, account.server);
 
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 
 	curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
 	curl_easy_setopt(curl, CURLOPT_USERNAME, account.user);
 	curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-	char *buffer = malloc((31+strlen(msg)));
-	sprintf(buffer, "source=GnuSocialShell&status=%s", msg);
+	char *buffer = (char *)malloc(16);
+	sprintf(buffer, "id=%d", id);
 
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer);
 	curl_easy_perform(curl);
@@ -55,7 +55,7 @@ void send_status(struct gss_account account, char *msg)
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) == 0) {
 		printf("Error: %s\n", error);
 	}
+	free(buffer);
 	free(error);
 	free(xml_data);
-	free(buffer);
 }

@@ -36,6 +36,15 @@ struct gss_account {
 	char server[32];
 };
 
+struct status {
+	char text[1024];
+	int id;
+	char author_screen_name[64];
+	int in_reply_to_id;
+	char in_reply_to_user[64];
+	char date[64];
+};
+
 struct account_info get_account_info(struct gss_account account);
 
 void send_status(struct gss_account account, char *msg);
@@ -43,6 +52,14 @@ void send_status(struct gss_account account, char *msg);
 void favorite(struct gss_account account, int id);
 
 void unfavorite(struct gss_account account, int id);
+
+void search_by_id(struct gss_account account, int id);
+
+void delete_status_by_id(struct gss_account account, int id);
+
+struct status makeStatusFromRawSource(char *raw_data, int data_size);
+
+void print_status(struct status status_);
 
 size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
 

@@ -43,10 +43,12 @@ void me_command(struct account_info info)
 
 void help_command()
 {
-	printf("/help\t\tPrints this help\n");
-	printf("/quit\t\tClose GnuSocialShell\n");
-	printf("/me\t\tPrints account information\n");
-	printf("/send [MESSAGE]\tSend MESSAGE to GnuSocial\n");
-	printf("/favorite [ID]\tFavorites the status ID\n");
+	printf("/help\t\t\tPrints this help\n");
+	printf("/quit\t\t\tClose GnuSocialShell\n");
+	printf("/me\t\t\tPrints account information\n");
+	printf("/send [MESSAGE]\t\tSend MESSAGE to GnuSocial\n");
+	printf("/favorite [ID]\t\tFavorites the status ID\n");
 	printf("/unfavorite [ID]\tDelete the status ID from the favorites list\n");
+	printf("/search [ID]\t\tFind one status using its ID\n");
+	printf("/delete [ID]\t\tDelete one status using its ID\n");
 }

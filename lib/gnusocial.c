@@ -55,3 +55,28 @@ int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, c
 	}
 	return ret;
 }
+
+struct status makeStatusFromRawSource(char *raw_data, int data_size)
+{
+	struct status out_status;
+	char *buffer = (char *)malloc(16);
+	parseXml(raw_data, data_size, "<text>", 6, out_status.text, 1024);
+	parseXml(raw_data, data_size, "<id>", 4, buffer, 16);
+	out_status.id = atoi(buffer);
+	parseXml(raw_data, data_size, "<screen_name>", 13, out_status.author_screen_name, 64);
+	parseXml(raw_data, data_size, "<in_reply_to_status_id>", 23, buffer, 16);
+	out_status.in_reply_to_id = atoi(buffer);
+	parseXml(raw_data, data_size, "<in_reply_to_screen_name>", 25, out_status.in_reply_to_user, 64);
+	parseXml(raw_data, data_size, "<created_at>", 12, out_status.date, 64);
+	return out_status;
+}
+
+void print_status(struct status status_)
+{
+	printf("@%s (ID%d)", status_.author_screen_name, status_.id);
+	if (status_.in_reply_to_user[0] != '\0') {
+		printf(" → @%s (ID%d)", status_.in_reply_to_user, status_.in_reply_to_id);
+	}
+	printf("\n%s\n", status_.text);
+	printf("%s\n", status_.date);
+}

@@ -22,7 +22,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.3"
+#define VERSION "0.5"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -30,7 +30,7 @@
 
 void version();
 void help();
-void gss_shell(struct account_info info);
+void gss_shell();
 
 struct gss_account main_account;
 
@@ -58,13 +58,10 @@ int main(int argc, char **argv)
 	if (hflag) {
 		help();
 	}
-	struct account_info main_account_info;
 	if (!vflag && !hflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
-			main_account_info = get_account_info(main_account);
-			me_command(main_account_info);
 			printf("Type '/help' to get a list of commands\n\n");
-			gss_shell(main_account_info);
+			gss_shell();
 		}
 	}
 	return ret;
@@ -97,11 +94,12 @@ int cmdcmp(char *a, char *b, int max)
 	return ret;
 }
 
-void gss_shell(struct account_info info)
+void gss_shell()
 {
 	extern struct gss_account main_account;
 	char cmdline[256];
 	char *args;
+	struct account_info info;
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
 		fgets(cmdline, 256, stdin);
@@ -135,6 +133,24 @@ void gss_shell(struct account_info info)
 			if (strlen(cmdline) >= 13) {
 				args = &cmdline[12];
 				unfavorite(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/search", 7) == 0) {
+			if (strlen(cmdline) >= 9) {
+				args = &cmdline[8];
+				search_by_id(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/delete", 7) == 0) {
+			if (strlen(cmdline) >= 9) {
+				args = &cmdline[8];
+				delete_status_by_id(main_account, atoi(args));
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");

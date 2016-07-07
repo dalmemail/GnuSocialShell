@@ -21,27 +21,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-void send_status(struct gss_account account, char *msg)
+void search_by_id(struct gss_account account, int id)
 {
 	char url[100];
-	sprintf(url, "%s://%s/api/statuses/update.xml", account.protocol, account.server);
-
+	sprintf(url, "%s://%s/api/statuses/show.xml&id=%d", account.protocol, account.server, id);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-
-	curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
+        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-	curl_easy_setopt(curl, CURLOPT_USERNAME, account.user);
-	curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-	char *buffer = malloc((31+strlen(msg)));
-	sprintf(buffer, "source=GnuSocialShell&status=%s", msg);
-
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer);
-	curl_easy_perform(curl);
-
-	curl_easy_cleanup(curl);
+        curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
 	fclose(xml);
 	xml = fopen("temp/file.xml", "r");
 	fseek(xml, 0L, SEEK_END);
@@ -52,10 +45,13 @@ void send_status(struct gss_account account, char *msg)
 	fclose(xml);
 	int xml_data_size = strlen(xml_data);
 	char *error = (char *)malloc(512);
-	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) == 0) {
-		printf("Error: %s\n", error);
+	if (parseXml(xml_data, xml_data_size, "<id>", 4, error, 512) != 0) {
+		printf("Error: ID '%d' not found\n", id);
+	}
+	else {
+		struct status status_by_id = makeStatusFromRawSource(xml_data, xml_data_size);
+		print_status(status_by_id);
 	}
 	free(error);
 	free(xml_data);
-	free(buffer);
 }

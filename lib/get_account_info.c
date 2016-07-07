@@ -19,6 +19,7 @@
 #include <curl/curl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct account_info get_account_info(struct gss_account account)
 {
