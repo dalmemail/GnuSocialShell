@@ -1,0 +1,6 @@
+#Default Config file for GnuSocialShell
+protocol=;
+user=;
+server=;
+#Uncomment this line to enable password store
+#password=;
