@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "loadConfig.h"
 #include "lib/gnusocial.h"
@@ -116,6 +117,24 @@ void gss_shell(struct account_info info)
 			if (strlen(cmdline) >= 7) {
 				args = &cmdline[6];
 				send_status(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/favorite", 9) == 0) {
+			if (strlen(cmdline) >= 11) {
+				args = &cmdline[10];
+				favorite(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/unfavorite", 11) == 0) {
+			if (strlen(cmdline) >= 13) {
+				args = &cmdline[12];
+				unfavorite(main_account, atoi(args));
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");

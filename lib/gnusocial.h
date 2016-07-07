@@ -40,6 +40,10 @@ struct account_info get_account_info(struct gss_account account);
 
 void send_status(struct gss_account account, char *msg);
 
+void favorite(struct gss_account account, int id);
+
+void unfavorite(struct gss_account account, int id);
+
 size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, char *output, int output_size);

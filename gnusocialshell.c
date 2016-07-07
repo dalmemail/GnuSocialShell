@@ -47,4 +47,6 @@ void help_command()
 	printf("/quit\t\tClose GnuSocialShell\n");
 	printf("/me\t\tPrints account information\n");
 	printf("/send [MESSAGE]\tSend MESSAGE to GnuSocial\n");
+	printf("/favorite [ID]\tFavorites the status ID\n");
+	printf("/unfavorite [ID]\tDelete the status ID from the favorites list\n");
 }
