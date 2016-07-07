@@ -7,6 +7,8 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 #### Dependencies
 
 - libcurl-dev
+
+
 #### Compile
       $ make
 
