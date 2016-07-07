@@ -51,4 +51,5 @@ void help_command()
 	printf("/unfavorite [ID]\tDelete the status ID from the favorites list\n");
 	printf("/search [ID]\t\tFind one status using its ID\n");
 	printf("/delete [ID]\t\tDelete one status using its ID\n");
+	printf("/reply [ID] [MESSAGE]\tSend MESSAGE as a reply of status ID\n");
 }

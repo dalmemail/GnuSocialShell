@@ -1,6 +1,6 @@
 CC = gcc
 OBJ_NAME = gss
-OBJS = Main.c loadConfig.c lib/get_account_info.c lib/gnusocial.c gnusocialshell.c lib/send_status.c lib/favorite.c lib/search_by_id.c lib/delete_status_by_id.c
+OBJS = Main.c loadConfig.c lib/get_account_info.c lib/gnusocial.c gnusocialshell.c lib/send_status.c lib/favorite.c lib/search_by_id.c lib/delete_status_by_id.c lib/answer_status_by_id.c
 FLAGS = -Wall -lcurl
 
 all:

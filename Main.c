@@ -22,7 +22,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.5"
+#define VERSION "0.6"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -99,6 +99,7 @@ void gss_shell()
 	extern struct gss_account main_account;
 	char cmdline[256];
 	char *args;
+	int i;
 	struct account_info info;
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
@@ -151,6 +152,25 @@ void gss_shell()
 			if (strlen(cmdline) >= 9) {
 				args = &cmdline[8];
 				delete_status_by_id(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/reply", 6) == 0) {
+			if (strlen(cmdline) >= 8) {
+				args = &cmdline[7];
+				int cmdline_size = strlen(cmdline);
+				for (i = 7; i < cmdline_size && cmdline[i] != ' '; i++) {
+				}
+				if ((i+1) < cmdline_size) {
+					cmdline[i] = '\0';
+					char *msg = &cmdline[i+1];
+					answer_status_by_id(main_account, atoi(args), msg);
+				}
+				else {
+					printf("Error: Invalid usage, see '/help' for details\n");
+				}
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
