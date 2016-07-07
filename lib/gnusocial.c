@@ -74,10 +74,10 @@ struct status makeStatusFromRawSource(char *raw_data, int data_size)
 
 void print_status(struct status status_)
 {
-	printf("@%s (ID%d)", status_.author_screen_name, status_.id);
+	printf("\033[36m@%s (ID%d)", status_.author_screen_name, status_.id);
 	if (status_.in_reply_to_user[0] != '\0') {
 		printf(" → @%s (ID%d)", status_.in_reply_to_user, status_.in_reply_to_id);
 	}
-	printf("\n%s\n", status_.text);
-	printf("%s\n", status_.date);
+	printf("\033[32m\n%s\n", status_.text);
+	printf("\033[33m%s\n\033[m", status_.date);
 }
