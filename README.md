@@ -18,9 +18,10 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 ### How to make a Configuration File
 
 First we have to open the file "config" using nano (or another text editor)
-      $ nano config
 
-We will get something like:
+                  $ nano config
+
+#### We will get something like:
       #Default Config file for GnuSocialShell
       protocol=;
       user=;
