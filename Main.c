@@ -21,7 +21,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -83,15 +83,43 @@ void help()
 	printf("\nEscrito por DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
 }
 
+/* compara una cadena de caracteres desde el caracter 0 hasta el caracter 'max'*/
+int cmdcmp(char *a, char *b, int max)
+{
+	int ret = 0;
+	int i;
+	for (i = 0; i < max; i++) {
+		if (a[i] != b[i]) {
+			ret++;
+		}
+	}
+	return ret;
+}
+
 void gss_shell(struct account_info info)
 {
 	extern struct gss_account main_account;
 	char cmdline[256];
+	char *args;
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
-		scanf("%s", cmdline);
+		fgets(cmdline, 256, stdin);
+		cmdline[strlen(cmdline)-1] = '\0';
 		if (strcmp(cmdline, "/help") == 0) {
 			help_command();
+		}
+		else if (strcmp(cmdline, "/me") == 0) {
+			info = get_account_info(main_account);
+			me_command(info);
+		}
+		else if (cmdcmp(cmdline, "/send", 5) == 0) {
+			if (strlen(cmdline) >= 7) {
+				args = &cmdline[6];
+				send_status(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
 		}
 		else if (strcmp(cmdline, "/quit") != 0 && cmdline[0] == '/') {
 			printf("Command '%s' not found\n", cmdline);

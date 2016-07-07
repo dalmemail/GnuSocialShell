@@ -43,6 +43,8 @@ void me_command(struct account_info info)
 
 void help_command()
 {
-	printf("/help\tPrints this help\n");
-	printf("/quit\tClose GnuSocialShell\n");
+	printf("/help\t\tPrints this help\n");
+	printf("/quit\t\tClose GnuSocialShell\n");
+	printf("/me\t\tPrints account information\n");
+	printf("/send [MESSAGE]\tSend MESSAGE to GnuSocial\n");
 }
