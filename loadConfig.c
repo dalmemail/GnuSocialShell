@@ -55,15 +55,18 @@ int loadConfig(char *ConfigFilePath)
 			}
 		}
 		if ((result = parseConfig("protocol", main_account.protocol, lines, n_lines)) < ret) {
+			printf("Error: Bad config file\n");
 			ret = result;
 		}
 		if ((result = parseConfig("user", main_account.user, lines, n_lines)) < ret) {
+			printf("Error: Bad config file\n");
 			ret = result;
 		}
 		if ((result = parseConfig("server", main_account.server, lines, n_lines)) < ret) {
+			printf("Error: Bad config file\n");
 			ret = result;
 		}
-		if ((result = parseConfig("password", main_account.password, lines, n_lines)) < 0) {
+		if ((result = parseConfig("password", main_account.password, lines, n_lines)) < 0 && ret == 0) {
 			printf("Type your password: ");
 			scanf("%s", main_account.password);
 		}
@@ -99,7 +102,7 @@ int parseConfig(char *to_search, char *output, char **lines, int n_lines)
 			}
 		}
 		if (exists) {
-			if (lines[i][final_pos+1] == '=') {
+			if (lines[i][final_pos+1] == '=' && lines[i][final_pos+2] != ';') {
 				final_pos += 2;
 				int y;
 				for (y = 0; lines[i][final_pos] != ';' && lines[i][final_pos] != '\0'; final_pos++) {

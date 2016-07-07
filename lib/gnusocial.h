@@ -59,6 +59,8 @@ void delete_status_by_id(struct gss_account account, int id);
 
 void answer_status_by_id(struct gss_account account, int id, char *msg);
 
+void read_timeline(struct gss_account account, char *timeline, int n_status);
+
 struct status makeStatusFromRawSource(char *raw_data, int data_size);
 
 void print_status(struct status status_);

@@ -43,13 +43,19 @@ void me_command(struct account_info info)
 
 void help_command()
 {
-	printf("/help\t\t\tPrints this help\n");
-	printf("/quit\t\t\tClose GnuSocialShell\n");
-	printf("/me\t\t\tPrints account information\n");
-	printf("/send [MESSAGE]\t\tSend MESSAGE to GnuSocial\n");
-	printf("/favorite [ID]\t\tFavorites the status ID\n");
-	printf("/unfavorite [ID]\tDelete the status ID from the favorites list\n");
-	printf("/search [ID]\t\tFind one status using its ID\n");
-	printf("/delete [ID]\t\tDelete one status using its ID\n");
-	printf("/reply [ID] [MESSAGE]\tSend MESSAGE as a reply of status ID\n");
+	printf("/help\t\t\t\tPrints this help\n");
+	printf("/quit\t\t\t\tClose GnuSocialShell\n");
+	printf("/me\t\t\t\tPrints account information\n");
+	printf("/send [MESSAGE]\t\t\tSend MESSAGE to GnuSocial\n");
+	printf("/favorite [ID]\t\t\tFavorites the status ID\n");
+	printf("/unfavorite [ID]\t\tDelete the status ID from the favorites list\n");
+	printf("/search [ID]\t\t\tFind one status using its ID\n");
+	printf("/delete [ID]\t\t\tDelete one status using its ID\n");
+	printf("/reply [ID] [MESSAGE]\t\tSend MESSAGE as a reply of status ID\n");
+	printf("/favorites [NUMBER]\t\tDownloads 'NUMBER' favorites from favorites list\n");
+	printf("/mentions [NUMBER]\t\tDownloads 'NUMBER' mentions\n");
+	printf("/home_timeline [NUMBER]\t\tDownloads 'NUMBER' status from Home Timeline\n");
+	printf("/ht [NUMBER]\t\t\tThe same that /home_timeline\n");
+	printf("/public_timeline [NUMBER]\tDownloads 'NUMBER' status from Public Timeline\n");
+	printf("/pt [NUMBER]\t\t\tThe same that /public_timeline\n");
 }

@@ -45,7 +45,7 @@ void search_by_id(struct gss_account account, int id)
 	fclose(xml);
 	int xml_data_size = strlen(xml_data);
 	char *error = (char *)malloc(512);
-	if (parseXml(xml_data, xml_data_size, "<id>", 4, error, 512) != 0) {
+	if (parseXml(xml_data, xml_data_size, "<id>", 4, error, 512) < 0) {
 		printf("Error: ID '%d' not found\n", id);
 	}
 	else {

@@ -49,9 +49,10 @@ int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, c
 	}
 	start_pos = pos+1;
 	if (ret == 0) {
-		for (i = 0; xml_data[start_pos+i] != '<' ||xml_data[start_pos+i+1] != '/'; i++) {
+		for (i = 0; (xml_data[start_pos+i] != '<' ||xml_data[start_pos+i+1] != '/') && i < output_size; i++) {
 			output[i] = xml_data[start_pos+i];
 		}
+		ret = (start_pos+i);
 	}
 	return ret;
 }

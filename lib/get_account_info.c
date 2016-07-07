@@ -48,58 +48,58 @@ struct account_info get_account_info(struct gss_account account)
 	char *output = (char *)malloc(512);
 	int xml_data_size = strlen(xml_data);
 	struct account_info info;
-	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) == 0) {
+	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
 	else {
-		if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) > 0) {
 			strcpy(info.name, output);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
-		if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, output, 512) > 0) {
 			strcpy(info.screen_name, output);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
-		if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) > 0) {
 			strcpy(info.location, output);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
-		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
 			strcpy(info.description, output);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
-		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
 			strcpy(info.url, output);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
-		if (parseXml(xml_data, xml_data_size, "<followers_count>", 17, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<followers_count>", 17, output, 512) > 0) {
 			info.followers = atoi(output);
 		}
 		else {
 			info.followers = -1;
 		}
-		if (parseXml(xml_data, xml_data_size, "<friends_count>", 15, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<friends_count>", 15, output, 512) > 0) {
 			info.friends = atoi(output);
 		}
 		else {
 			info.friends = -1;
 		}
-		if (parseXml(xml_data, xml_data_size, "<statuses_count>", 16, output, 512) == 0) {
+		if (parseXml(xml_data, xml_data_size, "<statuses_count>", 16, output, 512) > 0) {
 			info.statuses = atoi(output);
 		}
 		else {

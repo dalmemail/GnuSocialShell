@@ -21,27 +21,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-void send_status(struct gss_account account, char *msg)
+void read_timeline(struct gss_account account, char *timeline, int n_status)
 {
 	char url[100];
-	sprintf(url, "%s://%s/api/statuses/update.xml", account.protocol, account.server);
-
+	sprintf(url, "%s://%s/api/%s", account.protocol, account.server, timeline);
+	char to_read[16];
+	sprintf(to_read, "count=%d", n_status);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-
-	curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
+        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, to_read);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-	curl_easy_setopt(curl, CURLOPT_USERNAME, account.user);
-	curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-	char *buffer = malloc((31+strlen(msg)));
-	sprintf(buffer, "source=GnuSocialShell&status=%s", msg);
-
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer);
-	curl_easy_perform(curl);
-
-	curl_easy_cleanup(curl);
+        curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
 	fclose(xml);
 	xml = fopen("temp/file.xml", "r");
 	fseek(xml, 0L, SEEK_END);
@@ -55,7 +51,21 @@ void send_status(struct gss_account account, char *msg)
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
-	free(error);
+	else {
+		struct status status_;
+		int i;
+		int start_status_point = 0;
+		int real_status_point = 0;
+		char *status_data;
+		status_data = &xml_data[0];
+		for (i = 0; i < n_status && (real_status_point+13) < xml_data_size; i++) {
+			status_ = makeStatusFromRawSource(status_data, strlen(status_data));
+			print_status(status_);
+			start_status_point = parseXml(status_data, (xml_data_size-real_status_point), "</status>", 9, "", 0);
+			real_status_point += start_status_point;
+			status_data = &xml_data[real_status_point];
+		}
+	}
 	free(xml_data);
-	free(buffer);
+	free(error);
 }

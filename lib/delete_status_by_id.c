@@ -52,7 +52,7 @@ void delete_status_by_id(struct gss_account account, int id)
 	fclose(xml);
 	int xml_data_size = strlen(xml_data);
 	char *error = (char *)malloc(512);
-	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) == 0) {
+	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
 	free(buffer);
