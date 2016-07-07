@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2016 Dan Rulos.
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void me_command(struct account_info info);
+#include <string.h>
+#include <stdio.h>
 
-void help_command();
+struct account_info {
+	char name[64];
+	char screen_name[64];
+	char location[64];
+	char description[256];
+	char url[128];
+	int followers;
+	int friends;
+	int statuses;
+};
+
+struct gss_account {
+	char protocol[8];
+	char user[64];
+	char password[64];
+	char server[32];
+};
+
+struct account_info get_account_info(struct gss_account account);
+
+size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, char *output, int output_size);

@@ -17,10 +17,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "gnusocialshell.h"
 #include "loadConfig.h"
+#include "lib/gnusocial.h"
+#include "gnusocialshell.h"
 
-#define VERSION "0.1"
+#define VERSION "0.2"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -28,6 +29,7 @@
 
 void version();
 void help();
+void gss_shell(struct account_info info);
 
 struct gss_account main_account;
 
@@ -55,9 +57,13 @@ int main(int argc, char **argv)
 	if (hflag) {
 		help();
 	}
+	struct account_info main_account_info;
 	if (!vflag && !hflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
-			printf("%s\n%s\n%s\n%s\n", main_account.protocol, main_account.user, main_account.password, main_account.server);
+			main_account_info = get_account_info(main_account);
+			me_command(main_account_info);
+			printf("Type '/help' to get a list of commands\n\n");
+			gss_shell(main_account_info);
 		}
 	}
 	return ret;
@@ -75,4 +81,20 @@ void help()
 	printf("--version, -v\t\tMuestra la version de GSS\n");
 	printf("--config, -c [ARCHIVO]\tFija la ruta del archivo de configuracion\n");
 	printf("\nEscrito por DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
+}
+
+void gss_shell(struct account_info info)
+{
+	extern struct gss_account main_account;
+	char cmdline[256];
+	do {
+		printf("@%s@%s-> ", main_account.user, main_account.server);
+		scanf("%s", cmdline);
+		if (strcmp(cmdline, "/help") == 0) {
+			help_command();
+		}
+		else if (strcmp(cmdline, "/quit") != 0 && cmdline[0] == '/') {
+			printf("Command '%s' not found\n", cmdline);
+		}
+	} while(strcmp(cmdline, "/quit") != 0);
 }

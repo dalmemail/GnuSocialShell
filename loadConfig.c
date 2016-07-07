@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include "gnusocialshell.h"
+#include "lib/gnusocial.h"
 
 #define _FALSE 0
 #define _TRUE 1

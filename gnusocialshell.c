@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2016 Dan Rulos.
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void me_command(struct account_info info);
+#include "lib/gnusocial.h"
 
-void help_command();
+void me_command(struct account_info info)
+{
+	printf("Name: %s\nUser: %s\nLocation: %s\nDescription: %s\nUrl: %s\n", info.name, info.screen_name,
+	info.location, info.description, info.url);
+	if (info.followers > 0) {
+		printf("Followers: %d\n", info.followers);
+	}
+	else {
+		printf("Followers: ?\n");
+	}
+	if (info.friends > 0) {
+		printf("Friends: %d\n", info.friends);
+	}
+	else {
+		printf("Friends: ?\n");
+	}
+	if (info.statuses > 0) {
+		printf("Status: %d\n", info.statuses);
+	}
+	else {
+		printf("Status: ?\n");
+	}
+}
+
+void help_command()
+{
+	printf("/help\tPrints this help\n");
+	printf("/quit\tClose GnuSocialShell\n");
+}
