@@ -45,18 +45,6 @@ struct status {
 	char date[64];
 };
 
-struct group_info {
-	int id;
-	char url[128];
-	char nickname[64];
-	char fullname[64];
-	/* ZERO if not, Non-ZERO if true */
-	int member;
-	int admins;
-	int members;
-	char description[256];
-};
-
 struct account_info get_my_account_info(struct gss_account account);
 
 void send_status(struct gss_account account, char *msg);
@@ -78,14 +66,6 @@ void retweet(struct gss_account account, int id, int code);
 struct account_info get_user_info(struct gss_account account, char *source);
 
 int verify_account(struct gss_account account);
-
-struct group_info get_group_info(struct gss_account account, int id);
-
-void join_group(struct gss_account account, int id);
-
-void leave_group(struct gss_account account, int id);
-
-void list_groups(struct gss_account account, int n_groups);
 
 void print_users_array_info(struct gss_account account, char *source, int n_users);
 

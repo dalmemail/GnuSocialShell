@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct account_info get_my_account_info(struct gss_account account)
+struct account_info get_account_info(struct gss_account account)
 {
 	char url[100];
 	sprintf(url, "%s://%s/api/users/show.xml&screen_name=%s", account.protocol, account.server, account.user);

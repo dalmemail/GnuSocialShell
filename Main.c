@@ -25,7 +25,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.7"
+#define VERSION "0.8"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -35,6 +35,9 @@
 #define PUBLIC_TIMELINE "statuses/public_timeline.xml"
 #define HOME_TIMELINE "statuses/home_timeline.xml"
 #define MENTIONS "statuses/mentions.xml"
+
+#define FOLLOWERS "statuses/followers.xml"
+#define FRIENDS "statuses/friends.xml"
 
 void version();
 void help();
@@ -82,8 +85,10 @@ int main(int argc, char **argv)
 	if (!vflag && !hflag && !fflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
 			if (mkdir("temp/", 0777) != -1) {
-				printf("Type '/help' to get a list of commands\n\n");
-				gss_shell();
+				if (verify_account(main_account) != -1) {
+					printf("Type '/help' to get a list of commands\n\n");
+					gss_shell();
+				}
 			}
 			else {
 				printf("Error: %s\n", strerror(errno));
@@ -127,21 +132,28 @@ int cmdcmp(char *a, char *b)
 void gss_shell()
 {
 	extern struct gss_account main_account;
-	char cmdline[256];
+	char *cmdline = (char *)malloc(4096);
 	char *args;
 	int i;
 	struct account_info info;
+	struct account_info my_info;
+	my_info = get_my_account_info(main_account);
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
-		fgets(cmdline, 256, stdin);
+		fgets(cmdline, 4096, stdin);
 		cmdline[strlen(cmdline)-1] = '\0';
 		if (strlen(cmdline) > 0) {
-			if (strcmp(cmdline, "/help") == 0) {
-				help_command();
+			if (cmdcmp(cmdline, "/help") == 0) {
+				if (strlen(cmdline) >= 7) {
+					args = &cmdline[6];
+					help_command(args);
+				}
+				else {
+					help_command(NULL);
+				}
 			}
 			else if (strcmp(cmdline, "/me") == 0) {
-				info = get_account_info(main_account);
-				me_command(info);
+				print_user_info(my_info);
 			}
 			else if (cmdcmp(cmdline, "/send") == 0) {
 				if (strlen(cmdline) >= 7) {
@@ -260,9 +272,83 @@ void gss_shell()
 					printf("Error: Invalid usage, see '/help' for details\n");
 				}
 			}
+			else if (cmdcmp(cmdline, "/rt") == 0) {
+				if (strlen(cmdline) >= 5) {
+					args = &cmdline[4];
+					retweet(main_account, atoi(args), 1);
+				}
+				else {
+					printf("Error: Invalid usage, see '/help' for details\n");
+				}
+			}
+			else if (cmdcmp(cmdline, "/ui") == 0) {
+				if (strlen(cmdline) >= 5) {
+					args = &cmdline[4];
+					char screen_name[64];
+					sprintf(screen_name, "&screen_name=%s", args);
+					info = get_user_info(main_account, screen_name);
+					if (info.screen_name[0] != '\0') {
+						print_user_info(info);
+					}
+				}
+				else {
+					printf("Error: Invalid usage, see '/help' for details\n");
+				}
+			}
+			else if (cmdcmp(cmdline, "/user_info") == 0) {
+				if (strlen(cmdline) >= 12) {
+					args = &cmdline[11];
+					char id[16];
+					sprintf(id, "&id=%s", args);
+					info = get_user_info(main_account, id);
+					if (info.screen_name[0] != '\0') {
+						print_user_info(info);
+					}
+				}
+				else {
+					printf("Error: Invalid usage, see '/help' for details\n");
+				}
+			}
+			else if (cmdcmp(cmdline, "/followers_list") == 0) {
+				print_users_array_info(main_account, FOLLOWERS, my_info.followers);
+			}
+			else if (cmdcmp(cmdline, "/friends_list") == 0) {
+				print_users_array_info(main_account, FRIENDS, my_info.friends);
+			}
+			else if (cmdcmp(cmdline, "/group") == 0) {
+				if (strlen(cmdline) >= 8) {
+					args = &cmdline[7];
+					if (cmdcmp(args, "show") == 0 && strlen(cmdline) >= 13) {
+						args = &cmdline[12];
+						struct group_info group = get_group_info(main_account, atoi(args));
+						if (group.id > 0) {
+							print_group_info(group);
+						}
+					}
+					else if (cmdcmp(args, "join") == 0 && strlen(cmdline) >= 13) {
+						args = &cmdline[12];
+						join_group(main_account, atoi(args));
+					}
+					else if (cmdcmp(args, "leave") == 0 && strlen(cmdline) >= 14) {
+						args = &cmdline[13];
+						leave_group(main_account, atoi(args));
+					}
+					else if (cmdcmp(args, "list") == 0 && strlen(cmdline) >= 13) {
+						args = &cmdline[12];
+						list_groups(main_account, atoi(args));
+					}
+					else {
+						printf("Error: Invalid usage, see '/help group' for details\n");
+					}
+				}
+				else {
+					help_command("group");
+				}
+			}
 			else if (strcmp(cmdline, "/quit") != 0 && cmdline[0] == '/') {
 				printf("Command '%s' not found\n", cmdline);
 			}
 		}
 	} while(strcmp(cmdline, "/quit") != 0);
+	free(cmdline);
 }

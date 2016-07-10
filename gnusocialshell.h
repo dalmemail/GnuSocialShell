@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void me_command(struct account_info info);
+void print_user_info(struct account_info info);
 
-void help_command();
+void print_group_info(struct group_info group);
+
+void help_command(char *args);

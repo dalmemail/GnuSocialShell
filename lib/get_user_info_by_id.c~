@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnusocial.h"
 #include <curl/curl.h>
+#include "gnusocial.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-struct account_info get_my_account_info(struct gss_account account)
+struct account_info get_user_info(struct gss_account account, int id)
 {
 	char url[100];
-	sprintf(url, "%s://%s/api/users/show.xml&screen_name=%s", account.protocol, account.server, account.user);
+	sprintf(url, "%s://%s/api/users/show.xml%s", account.protocol, account.server, source);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -49,6 +48,7 @@ struct account_info get_my_account_info(struct gss_account account)
 	struct account_info info;
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
+		info.screen_name[0] = '\0';
 	}
 	else {
 		if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) > 0) {
@@ -62,29 +62,29 @@ struct account_info get_my_account_info(struct gss_account account)
 			strcpy(info.screen_name, output);
 		}
 		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
+			info.screen_name[0] = '?';
+			info.screen_name[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) > 0) {
 			strcpy(info.location, output);
 		}
 		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
+			info.location[0] = '?';
+			info.location[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
 			strcpy(info.description, output);
 		}
 		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
+			info.description[0] = '?';
+			info.description[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
 			strcpy(info.url, output);
 		}
 		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
+			info.url[0] = '?';
+			info.url[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<followers_count>", 17, output, 512) > 0) {
 			info.followers = atoi(output);

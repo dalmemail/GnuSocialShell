@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnusocial.h"
 #include <curl/curl.h>
+#include "gnusocial.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-struct account_info get_my_account_info(struct gss_account account)
+void list_groups(struct gss_account account, int n_groups)
 {
-	char url[100];
-	sprintf(url, "%s://%s/api/users/show.xml&screen_name=%s", account.protocol, account.server, account.user);
+	char url[128];
+	sprintf(url, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -33,6 +32,10 @@ struct account_info get_my_account_info(struct gss_account account)
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
+	char count[30];
+	sprintf(count, "count=%d", n_groups);
+
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, count);
         curl_easy_perform(curl);
         curl_easy_cleanup(curl);
 	fclose(xml);
@@ -44,69 +47,32 @@ struct account_info get_my_account_info(struct gss_account account)
 	fread(xml_data, filesize, filesize, xml);
 	fclose(xml);
 	char *error = (char *)malloc(512);
-	char *output = (char *)malloc(512);
 	int xml_data_size = strlen(xml_data);
-	struct account_info info;
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
-	else {
-		if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) > 0) {
-			strcpy(info.name, output);
-		}
-		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
-		}
-		if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, output, 512) > 0) {
-			strcpy(info.screen_name, output);
-		}
-		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
-		}
-		if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) > 0) {
-			strcpy(info.location, output);
-		}
-		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
-		}
-		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
-			strcpy(info.description, output);
-		}
-		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
-		}
-		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
-			strcpy(info.url, output);
-		}
-		else {
-			info.name[0] = '?';
-			info.name[1] = '\0';
-		}
-		if (parseXml(xml_data, xml_data_size, "<followers_count>", 17, output, 512) > 0) {
-			info.followers = atoi(output);
-		}
-		else {
-			info.followers = -1;
-		}
-		if (parseXml(xml_data, xml_data_size, "<friends_count>", 15, output, 512) > 0) {
-			info.friends = atoi(output);
-		}
-		else {
-			info.friends = -1;
-		}
-		if (parseXml(xml_data, xml_data_size, "<statuses_count>", 16, output, 512) > 0) {
-			info.statuses = atoi(output);
-		}
-		else {
-			info.statuses = -1;
+	else if (xml_data_size > 0) {
+		char nickname[64];
+		char description[256];
+		int start_status_point = 0;
+		int real_status_point = 0;
+		char *array_data;
+		char id[16];
+		array_data = &xml_data[0];
+		int i;
+		for (i = 0; i < n_groups && (real_status_point+13) < xml_data_size; i++) {
+			parseXml(array_data, (xml_data_size-real_status_point), "<id>", 4, id, 16);
+			parseXml(array_data, (xml_data_size-real_status_point), "<nickname>", 10, nickname, 64);
+			parseXml(array_data, (xml_data_size-real_status_point), "<description>", 13, description, 256);
+			start_status_point = parseXml(array_data, (xml_data_size-real_status_point), "</group>", 8, "", 0);
+			printf("\033[36m!%s\033[31m (ID %s)\n\033[32m%s\n\033[m", nickname, id, description);
+			real_status_point += start_status_point;
+			array_data = &xml_data[real_status_point];
 		}
 	}
-	free(output);
+	else {
+		printf("Error: Reading '%d' groups from '%s'\n", n_groups, url);
+	}
 	free(error);
 	free(xml_data);
-	return info;
 }
