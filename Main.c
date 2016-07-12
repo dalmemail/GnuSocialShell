@@ -47,7 +47,7 @@ struct gss_account main_account;
 
 int main(int argc, char **argv)
 {
-	char config_path[MAX_PATH] = "./config\0";
+	char config_path[MAX_PATH] = "/etc/gnusocialshell.conf\0";
 	int ret = 0;
 	int vflag = _FALSE;
 	int hflag = _FALSE;
