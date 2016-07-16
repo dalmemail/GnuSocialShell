@@ -19,4 +19,6 @@ void print_user_info(struct account_info info);
 
 void print_group_info(struct group_info group);
 
+void print_little_group_info(struct little_group_info group);
+
 void help_command(char *args);

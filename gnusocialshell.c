@@ -65,6 +65,11 @@ void print_group_info(struct group_info group)
 	}
 }
 
+void print_little_group_info(struct little_group_info group)
+{
+	printf("\033[36m!%s\033[31m (ID %d)\n\033[32m%s\n\033[m", group.nickname, group.id, group.description);
+}
+
 void help_command(char *args)
 {
 	if (args == NULL) {
@@ -89,6 +94,9 @@ void help_command(char *args)
 		printf("/followers_list\t\t\tPrints the people who is following you\n");
 		printf("/friends_list\t\t\tPrints the people you are following\n");
 		printf("/group\t\t\t\tThe same that '/help group'\n");
+		printf("/start_follow [SCREEN_NAME]\tFollow one user using its SCREEN_NAME\n");
+		printf("/sf [SCREEN_NAME]\t\tThe same that /start_follow\n");
+		printf("/stop_follow [SCREEN_NAME]\tUn-Follow one user using its SCREEN_NAME\n");
 	}
 	else if (strcmp(args, "group") == 0) {
 		printf("/group show [ID]\t\tPrints group detailed information using its ID\n");

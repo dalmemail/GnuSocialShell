@@ -20,10 +20,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct little_group_info *list_groups(struct gss_account account, int n_groups)
+void unfollow_user(struct gss_account account, char *screen_name)
 {
 	char url[128];
-	sprintf(url, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
+	sprintf(url, "%s://%s/api/friendships/destroy.xml", account.protocol, account.server);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -32,10 +32,10 @@ struct little_group_info *list_groups(struct gss_account account, int n_groups)
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-	char count[30];
-	sprintf(count, "count=%d", n_groups);
+	char screen_name_to_unfollow[100];
+	sprintf(screen_name_to_unfollow, "screen_name=%s", screen_name);
 
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, count);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, screen_name_to_unfollow);
         curl_easy_perform(curl);
         curl_easy_cleanup(curl);
 	fclose(xml);
@@ -48,34 +48,9 @@ struct little_group_info *list_groups(struct gss_account account, int n_groups)
 	fclose(xml);
 	char *error = (char *)malloc(512);
 	int xml_data_size = strlen(xml_data);
-	struct little_group_info *groups = (struct little_group_info*)malloc(n_groups * sizeof(struct group_info));
-	int i;
-	for (i = 0; i < n_groups; i++) {
-		groups[i].id = 0;
-	}
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
-	else if (xml_data_size > 0) {
-		int start_status_point = 0;
-		int real_status_point = 0;
-		char *array_data;
-		char id[16];
-		array_data = &xml_data[0];
-		for (i = 0; i < n_groups && (real_status_point+13) < xml_data_size; i++) {
-			parseXml(array_data, (xml_data_size-real_status_point), "<id>", 4, id, 16);
-			groups[i].id = atoi(id);
-			parseXml(array_data, (xml_data_size-real_status_point), "<nickname>", 10, groups[i].nickname, 64);
-			parseXml(array_data, (xml_data_size-real_status_point), "<description>", 13, groups[i].description, 256);
-			start_status_point = parseXml(array_data, (xml_data_size-real_status_point), "</group>", 8, "", 0);
-			real_status_point += start_status_point;
-			array_data = &xml_data[real_status_point];
-		}
-	}
-	else {
-		printf("Error: Reading '%d' groups from '%s'\n", n_groups, url);
-	}
 	free(error);
 	free(xml_data);
-	return groups;
 }

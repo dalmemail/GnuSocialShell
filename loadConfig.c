@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <termios.h>
 #include "lib/gnusocial.h"
 
 #define _FALSE 0
@@ -68,7 +69,14 @@ int loadConfig(char *ConfigFilePath)
 		}
 		if ((result = parseConfig("password", main_account.password, lines, n_lines)) < 0 && ret == 0) {
 			printf("Type your password: ");
-			scanf("%s", main_account.password);
+			struct termios term, term_orig;
+			tcgetattr(STDIN_FILENO, &term);
+			term_orig = term;
+			term.c_lflag &= ~ECHO;
+			tcsetattr(STDIN_FILENO, TCSANOW, &term);
+			scanf("%49s",main_account.password);
+			tcsetattr(STDIN_FILENO, TCSANOW, &term_orig);
+			printf("\n");
 		}
 	}
 	else {

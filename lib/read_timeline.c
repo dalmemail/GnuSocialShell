@@ -21,8 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void read_timeline(struct gss_account account, char *timeline, int n_status)
+struct status *read_timeline(struct gss_account account, char *timeline, int n_status)
 {
+	struct status *status_list = (struct status*)malloc(n_status * sizeof(struct status));
 	char url[100];
 	sprintf(url, "%s://%s/api/%s", account.protocol, account.server, timeline);
 	char to_read[16];
@@ -48,19 +49,21 @@ void read_timeline(struct gss_account account, char *timeline, int n_status)
 	fclose(xml);
 	int xml_data_size = strlen(xml_data);
 	char *error = (char *)malloc(512);
+	int i;
+	for (i = 0; i < n_status; i++) {
+		status_list[i].id = 0;
+	}
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
 	else {
-		struct status status_;
 		int i;
 		int start_status_point = 0;
 		int real_status_point = 0;
 		char *status_data;
 		status_data = &xml_data[0];
 		for (i = 0; i < n_status && (real_status_point+13) < xml_data_size; i++) {
-			status_ = makeStatusFromRawSource(status_data, strlen(status_data));
-			print_status(status_);
+			status_list[i] = makeStatusFromRawSource(status_data, strlen(status_data));
 			start_status_point = parseXml(status_data, (xml_data_size-real_status_point), "</status>", 9, "", 0);
 			real_status_point += start_status_point;
 			status_data = &xml_data[real_status_point];
@@ -68,4 +71,5 @@ void read_timeline(struct gss_account account, char *timeline, int n_status)
 	}
 	free(xml_data);
 	free(error);
+	return status_list;
 }

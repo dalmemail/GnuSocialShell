@@ -25,7 +25,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.8"
+#define VERSION "0.9"
 #define MAX_PATH 128
 #define _FALSE 0
 #define _TRUE 1
@@ -86,7 +86,6 @@ int main(int argc, char **argv)
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
 			if (mkdir("temp/", 0777) != -1) {
 				if (verify_account(main_account) != -1) {
-					printf("Type '/help' to get a list of commands\n\n");
 					gss_shell();
 				}
 			}
@@ -111,7 +110,7 @@ void help()
 	printf("--help, -h\t\tPrints this help\n");
 	printf("--version, -v\t\tPrints GSS version\n");
 	printf("--config, -c [FILE]\tUse FILE as configuration file\n");
-	printf("\nWrote by DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
+	printf("\nWritten by DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
 }
 
 /* compara una cadena de caracteres desde el caracter 0 hasta que encuentra un espacio en blanco
@@ -121,234 +120,337 @@ int cmdcmp(char *a, char *b)
 	int ret = 0;
 	int max = strlen(a);
 	int i;
-	for (i = 0; i < max && a[i] != ' '; i++) {
-		if (a[i] != b[i]) {
-			ret++;
+	if (strlen(a) >= strlen(b)) {
+		for (i = 0; i < max && a[i] != ' '; i++) {
+			if (a[i] != b[i]) {
+				ret++;
+			}
 		}
 	}
+	else {
+		ret = 1;
+	}
 	return ret;
+}
+
+int executeCommand(char *cmdline)
+{
+	extern struct gss_account main_account;
+	char *args;
+	int i;
+	struct account_info info;
+	if (strlen(cmdline) > 0) {
+		if (cmdcmp(cmdline, "/help") == 0) {
+			if (strlen(cmdline) >= 7) {
+				args = &cmdline[6];
+				help_command(args);
+			}
+			else {
+				help_command(NULL);
+			}
+		}
+		else if (strcmp(cmdline, "/me") == 0) {
+			info = get_my_account_info(main_account);
+			print_user_info(info);
+		}
+		else if (cmdcmp(cmdline, "/send") == 0) {
+			if (strlen(cmdline) >= 7) {
+				args = &cmdline[6];
+				send_status(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/favorite") == 0) {
+			if (strlen(cmdline) >= 11) {
+				args = &cmdline[10];
+				favorite(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/unfavorite") == 0) {
+			if (strlen(cmdline) >= 13) {
+				args = &cmdline[12];
+				unfavorite(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/search") == 0) {
+			if (strlen(cmdline) >= 9) {
+				args = &cmdline[8];
+				search_by_id(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/delete") == 0) {
+			if (strlen(cmdline) >= 9) {
+				args = &cmdline[8];
+				delete_status_by_id(main_account, atoi(args));
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/reply") == 0) {
+			if (strlen(cmdline) >= 8) {
+				args = &cmdline[7];
+				int cmdline_size = strlen(cmdline);
+				for (i = 7; i < cmdline_size && cmdline[i] != ' '; i++);
+				if ((i+1) < cmdline_size) {
+					cmdline[i] = '\0';
+					char *msg = &cmdline[i+1];
+					answer_status_by_id(main_account, atoi(args), msg);
+				}
+				else {
+					printf("Error: Invalid usage, see '/help' for details\n");
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/favorites") == 0) {
+			if (strlen(cmdline) >= 12) {
+				args = &cmdline[11];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, FAVORITES, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/mentions") == 0) {
+			if (strlen(cmdline) >= 11) {
+				args = &cmdline[10];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, MENTIONS, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/home_timeline") == 0) {
+			if (strlen(cmdline) >= 16) {
+				args = &cmdline[15];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, HOME_TIMELINE, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/ht") == 0) {
+			if (strlen(cmdline) >= 5) {
+				args = &cmdline[4];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, HOME_TIMELINE, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/public_timeline") == 0) {
+			if (strlen(cmdline) >= 18) {
+				args = &cmdline[17];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, PUBLIC_TIMELINE, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/pt") == 0) {
+			if (strlen(cmdline) >= 5) {
+				args = &cmdline[4];
+				int n_status = atoi(args);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, PUBLIC_TIMELINE, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/rt") == 0) {
+			if (strlen(cmdline) >= 5) {
+				args = &cmdline[4];
+				retweet(main_account, atoi(args), 1);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/ui") == 0) {
+			if (strlen(cmdline) >= 5) {
+				args = &cmdline[4];
+				char screen_name[64];
+				sprintf(screen_name, "&screen_name=%s", args);
+				info = get_user_info(main_account, screen_name);
+				if (info.screen_name[0] != '\0') {
+					print_user_info(info);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/user_info") == 0) {
+			if (strlen(cmdline) >= 12) {
+				args = &cmdline[11];
+				char id[16];
+				sprintf(id, "&id=%s", args);
+				info = get_user_info(main_account, id);
+				if (info.screen_name[0] != '\0') {
+					print_user_info(info);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/followers_list") == 0 && strlen(cmdline) >= 15) {
+			info = get_my_account_info(main_account);
+			print_users_array_info(main_account, FOLLOWERS, info.followers);
+		}
+		else if (cmdcmp(cmdline, "/friends_list") == 0) {
+			info = get_my_account_info(main_account);
+			print_users_array_info(main_account, FRIENDS, info.friends);
+		}
+		else if (cmdcmp(cmdline, "/group") == 0) {
+			if (strlen(cmdline) >= 8) {
+				args = &cmdline[7];
+				if (cmdcmp(args, "show") == 0 && strlen(cmdline) >= 13) {
+					args = &cmdline[12];
+					struct group_info group = get_group_info(main_account, atoi(args));
+					if (group.id > 0) {
+						print_group_info(group);
+					}
+				}
+				else if (cmdcmp(args, "join") == 0 && strlen(cmdline) >= 13) {
+					args = &cmdline[12];
+					join_group(main_account, atoi(args));
+				}
+				else if (cmdcmp(args, "leave") == 0 && strlen(cmdline) >= 14) {
+					args = &cmdline[13];
+					leave_group(main_account, atoi(args));
+				}
+				else if (cmdcmp(args, "list") == 0 && strlen(cmdline) >= 13) {
+					args = &cmdline[12];
+					int n_groups = atoi(args);
+					if (n_groups > 0) {
+						struct little_group_info *groups = list_groups(main_account, n_groups);
+						for (i = 0; i < n_groups; i++) {
+							if (groups[i].id != 0) {
+								print_little_group_info(groups[i]);
+							}
+						}
+						free(groups);
+					}
+				}
+				else {
+					printf("Error: Invalid usage, see '/help group' for details\n");
+				}
+			}
+			else {
+				help_command("group");
+			}
+		}
+		else if (cmdcmp(cmdline, "/start_follow") == 0) {
+			if (strlen(cmdline) >= 15) {
+				args = &cmdline[14];
+				follow_user(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/sf") == 0) {
+			if (strlen(cmdline) >= 5) {
+				args = &cmdline[4];
+				follow_user(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/stop_follow") == 0) {
+			if (strlen(cmdline) >= 14) {
+				args = &cmdline[13];
+				unfollow_user(main_account, args);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (strcmp(cmdline, "/quit") != 0 && cmdline[0] == '/') {
+			printf("Command '%s' not found\n", cmdline);
+		}
+	}
+	return strcmp(cmdline, "/quit");
 }
 
 void gss_shell()
 {
 	extern struct gss_account main_account;
 	char *cmdline = (char *)malloc(4096);
-	char *args;
-	int i;
-	struct account_info info;
-	struct account_info my_info;
-	my_info = get_my_account_info(main_account);
+	printf("Type '/help' to get a list of commands\n\n");
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
 		fgets(cmdline, 4096, stdin);
 		cmdline[strlen(cmdline)-1] = '\0';
-		if (strlen(cmdline) > 0) {
-			if (cmdcmp(cmdline, "/help") == 0) {
-				if (strlen(cmdline) >= 7) {
-					args = &cmdline[6];
-					help_command(args);
-				}
-				else {
-					help_command(NULL);
-				}
-			}
-			else if (strcmp(cmdline, "/me") == 0) {
-				print_user_info(my_info);
-			}
-			else if (cmdcmp(cmdline, "/send") == 0) {
-				if (strlen(cmdline) >= 7) {
-					args = &cmdline[6];
-					send_status(main_account, args);
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/favorite") == 0) {
-				if (strlen(cmdline) >= 11) {
-					args = &cmdline[10];
-					favorite(main_account, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/unfavorite") == 0) {
-				if (strlen(cmdline) >= 13) {
-					args = &cmdline[12];
-					unfavorite(main_account, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/search") == 0) {
-				if (strlen(cmdline) >= 9) {
-					args = &cmdline[8];
-					search_by_id(main_account, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/delete") == 0) {
-				if (strlen(cmdline) >= 9) {
-					args = &cmdline[8];
-					delete_status_by_id(main_account, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/reply") == 0) {
-				if (strlen(cmdline) >= 8) {
-					args = &cmdline[7];
-					int cmdline_size = strlen(cmdline);
-					for (i = 7; i < cmdline_size && cmdline[i] != ' '; i++);
-					if ((i+1) < cmdline_size) {
-						cmdline[i] = '\0';
-						char *msg = &cmdline[i+1];
-						answer_status_by_id(main_account, atoi(args), msg);
-					}
-					else {
-						printf("Error: Invalid usage, see '/help' for details\n");
-					}
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/favorites") == 0) {
-				if (strlen(cmdline) >= 12) {
-					args = &cmdline[11];
-					read_timeline(main_account, FAVORITES, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/mentions") == 0) {
-				if (strlen(cmdline) >= 11) {
-					args = &cmdline[10];
-					read_timeline(main_account, MENTIONS, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/home_timeline") == 0) {
-				if (strlen(cmdline) >= 16) {
-					args = &cmdline[15];
-					read_timeline(main_account, HOME_TIMELINE, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/ht") == 0) {
-				if (strlen(cmdline) >= 5) {
-					args = &cmdline[4];
-					read_timeline(main_account, HOME_TIMELINE, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/public_timeline") == 0) {
-				if (strlen(cmdline) >= 18) {
-					args = &cmdline[17];
-					read_timeline(main_account, PUBLIC_TIMELINE, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/pt") == 0) {
-				if (strlen(cmdline) >= 5) {
-					args = &cmdline[4];
-					read_timeline(main_account, PUBLIC_TIMELINE, atoi(args));
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/rt") == 0) {
-				if (strlen(cmdline) >= 5) {
-					args = &cmdline[4];
-					retweet(main_account, atoi(args), 1);
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/ui") == 0) {
-				if (strlen(cmdline) >= 5) {
-					args = &cmdline[4];
-					char screen_name[64];
-					sprintf(screen_name, "&screen_name=%s", args);
-					info = get_user_info(main_account, screen_name);
-					if (info.screen_name[0] != '\0') {
-						print_user_info(info);
-					}
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/user_info") == 0) {
-				if (strlen(cmdline) >= 12) {
-					args = &cmdline[11];
-					char id[16];
-					sprintf(id, "&id=%s", args);
-					info = get_user_info(main_account, id);
-					if (info.screen_name[0] != '\0') {
-						print_user_info(info);
-					}
-				}
-				else {
-					printf("Error: Invalid usage, see '/help' for details\n");
-				}
-			}
-			else if (cmdcmp(cmdline, "/followers_list") == 0) {
-				print_users_array_info(main_account, FOLLOWERS, my_info.followers);
-			}
-			else if (cmdcmp(cmdline, "/friends_list") == 0) {
-				print_users_array_info(main_account, FRIENDS, my_info.friends);
-			}
-			else if (cmdcmp(cmdline, "/group") == 0) {
-				if (strlen(cmdline) >= 8) {
-					args = &cmdline[7];
-					if (cmdcmp(args, "show") == 0 && strlen(cmdline) >= 13) {
-						args = &cmdline[12];
-						struct group_info group = get_group_info(main_account, atoi(args));
-						if (group.id > 0) {
-							print_group_info(group);
-						}
-					}
-					else if (cmdcmp(args, "join") == 0 && strlen(cmdline) >= 13) {
-						args = &cmdline[12];
-						join_group(main_account, atoi(args));
-					}
-					else if (cmdcmp(args, "leave") == 0 && strlen(cmdline) >= 14) {
-						args = &cmdline[13];
-						leave_group(main_account, atoi(args));
-					}
-					else if (cmdcmp(args, "list") == 0 && strlen(cmdline) >= 13) {
-						args = &cmdline[12];
-						list_groups(main_account, atoi(args));
-					}
-					else {
-						printf("Error: Invalid usage, see '/help group' for details\n");
-					}
-				}
-				else {
-					help_command("group");
-				}
-			}
-			else if (strcmp(cmdline, "/quit") != 0 && cmdline[0] == '/') {
-				printf("Command '%s' not found\n", cmdline);
-			}
-		}
-	} while(strcmp(cmdline, "/quit") != 0);
+	} while(executeCommand(cmdline) != 0);
 	free(cmdline);
 }
