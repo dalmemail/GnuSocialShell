@@ -7,7 +7,7 @@ all:
 	$(CC) $(FLAGS) $(OBJS) -o $(OBJ_NAME) $$(pkg-config libcurl --cflags --libs)
 install:
 	$(CC) $(FLAGS) $(OBJS) -o $(OBJ_NAME) $$(pkg-config libcurl --cflags --libs)
-	cp config /etc/gnusocialshell.conf
-	cp gnusocialshell /usr/bin
+	install -Dm644 config $(DESTDIR)/etc/gnusocialshell.conf
+	install -Dm755 gnusocialshell $(DESTDIR)/usr/bin/gnusocialshell
 clean:
 	rm $(OBJ_NAME)
