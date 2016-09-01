@@ -22,26 +22,9 @@
 
 struct group_info get_group_info(struct gss_account account, int id)
 {
-	char url[128];
-	sprintf(url, "%s://%s/api/statusnet/groups/show.xml&id=%d", account.protocol, account.server, id);
-	FILE *xml = fopen("temp/file.xml", "wb");
-	CURL *curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-	fclose(xml);
-	xml = fopen("temp/file.xml", "r");
-	fseek(xml, 0L, SEEK_END);
-	int filesize = ftell(xml);
-	rewind(xml);
-	char *xml_data = (char *)malloc(filesize);
-	fread(xml_data, filesize, filesize, xml);
-	fclose(xml);
+	char send[16];
+	sprintf(send, "id=%d", id);
+	char *xml_data = send_to_api(account, send, "statusnet/groups/show.xml");
 	char *error = (char *)malloc(512);
 	char *output = (char *)malloc(512);
 	int xml_data_size = strlen(xml_data);

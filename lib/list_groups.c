@@ -24,28 +24,9 @@ struct little_group_info *list_groups(struct gss_account account, int n_groups)
 {
 	char url[128];
 	sprintf(url, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
-	FILE *xml = fopen("temp/file.xml", "wb");
-	CURL *curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-	char count[30];
+	char count[32];
 	sprintf(count, "count=%d", n_groups);
-
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, count);
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-	fclose(xml);
-	xml = fopen("temp/file.xml", "r");
-	fseek(xml, 0L, SEEK_END);
-	int filesize = ftell(xml);
-	rewind(xml);
-	char *xml_data = (char *)malloc(filesize);
-	fread(xml_data, filesize, filesize, xml);
-	fclose(xml);
+	char *xml_data = send_to_api(account,count,"statusnet/groups/list_all.xml");
 	char *error = (char *)malloc(512);
 	int xml_data_size = strlen(xml_data);
 	struct little_group_info *groups = (struct little_group_info*)malloc(n_groups * sizeof(struct group_info));

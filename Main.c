@@ -25,8 +25,8 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 
-#define VERSION "0.9"
-#define MAX_PATH 128
+#define VERSION "1.0"
+#define MAX_PATH 256
 #define _FALSE 0
 #define _TRUE 1
 #define ALL_OK 0
@@ -40,14 +40,16 @@
 #define FRIENDS "statuses/friends.xml"
 
 void version();
-void help();
+void help(char *prog);
 void gss_shell();
 
 struct gss_account main_account;
 
 int main(int argc, char **argv)
 {
-	char config_path[MAX_PATH] = "/etc/gnusocialshell.conf\0";
+	char *home_directory = getenv("HOME");
+	char config_path[MAX_PATH];
+	sprintf(config_path, "%s/.config/gnusocialshell/gnusocialshell.conf", home_directory);
 	int ret = 0;
 	int vflag = _FALSE;
 	int hflag = _FALSE;
@@ -80,7 +82,7 @@ int main(int argc, char **argv)
 		version();
 	}
 	if (hflag) {
-		help();
+		help(&argv[0][0]);
 	}
 	if (!vflag && !hflag && !fflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
@@ -104,11 +106,11 @@ void version()
 	printf("GnuSocialShell v%s\n", VERSION);
 }
 
-void help()
+void help(char *prog)
 {
-	printf("Usage: ./gss [OPTION]\n");
+	printf("Usage: %s [OPTION]\n", prog);
 	printf("--help, -h\t\tPrints this help\n");
-	printf("--version, -v\t\tPrints GSS version\n");
+	printf("--version, -v\t\tPrints GnuSocialShell version\n");
 	printf("--config, -c [FILE]\tUse FILE as configuration file\n");
 	printf("\nWritten by DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
 }
@@ -138,6 +140,7 @@ int executeCommand(char *cmdline)
 	extern struct gss_account main_account;
 	char *args;
 	int i;
+	int result = 1;
 	struct account_info info;
 	if (strlen(cmdline) > 0) {
 		if (cmdcmp(cmdline, "/help") == 0) {
@@ -150,8 +153,10 @@ int executeCommand(char *cmdline)
 			}
 		}
 		else if (strcmp(cmdline, "/me") == 0) {
-			info = get_my_account_info(main_account);
-			print_user_info(info);
+			info = get_my_account_info(main_account, &result);
+			if (!result) {
+				print_user_info(info);
+			}
 		}
 		else if (cmdcmp(cmdline, "/send") == 0) {
 			if (strlen(cmdline) >= 7) {
@@ -183,7 +188,10 @@ int executeCommand(char *cmdline)
 		else if (cmdcmp(cmdline, "/search") == 0) {
 			if (strlen(cmdline) >= 9) {
 				args = &cmdline[8];
-				search_by_id(main_account, atoi(args));
+				struct status status_ = search_by_id(main_account, atoi(args), &result);
+				if (!result) {
+					print_status(status_);
+				}
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
@@ -362,12 +370,16 @@ int executeCommand(char *cmdline)
 			}
 		}
 		else if (cmdcmp(cmdline, "/followers_list") == 0 && strlen(cmdline) >= 15) {
-			info = get_my_account_info(main_account);
-			print_users_array_info(main_account, FOLLOWERS, info.followers);
+			info = get_my_account_info(main_account, &result);
+			if (!result) {
+				print_users_array_info(main_account, FOLLOWERS, info.followers);
+			}
 		}
 		else if (cmdcmp(cmdline, "/friends_list") == 0) {
-			info = get_my_account_info(main_account);
-			print_users_array_info(main_account, FRIENDS, info.friends);
+			info = get_my_account_info(main_account, &result);
+			if (!result) {
+				print_users_array_info(main_account, FRIENDS, info.friends);
+			}
 		}
 		else if (cmdcmp(cmdline, "/group") == 0) {
 			if (strlen(cmdline) >= 8) {

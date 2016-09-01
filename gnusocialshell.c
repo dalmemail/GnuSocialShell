@@ -97,6 +97,7 @@ void help_command(char *args)
 		printf("/start_follow [SCREEN_NAME]\tFollow one user using its SCREEN_NAME\n");
 		printf("/sf [SCREEN_NAME]\t\tThe same that /start_follow\n");
 		printf("/stop_follow [SCREEN_NAME]\tUn-Follow one user using its SCREEN_NAME\n");
+		//printf("/notifications\t\t\tPrints latest notifications\n");
 	}
 	else if (strcmp(args, "group") == 0) {
 		printf("/group show [ID]\t\tPrints group detailed information using its ID\n");

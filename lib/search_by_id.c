@@ -21,37 +21,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-void search_by_id(struct gss_account account, int id)
+struct status search_by_id(struct gss_account account, int id, int *result)
 {
-	char url[100];
-	sprintf(url, "%s://%s/api/statuses/show.xml&id=%d", account.protocol, account.server, id);
-	FILE *xml = fopen("temp/file.xml", "wb");
-	CURL *curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-	fclose(xml);
-	xml = fopen("temp/file.xml", "r");
-	fseek(xml, 0L, SEEK_END);
-	int filesize = ftell(xml);
-	rewind(xml);
-	char *xml_data = (char *)malloc(filesize);
-	fread(xml_data, filesize, filesize, xml);
-	fclose(xml);
+	char xml_doc[32];
+	sprintf(xml_doc, "statuses/show.xml&id=%d", id);
+	char *xml_data = send_to_api(account,NULL,xml_doc);
 	int xml_data_size = strlen(xml_data);
-	char *error = (char *)malloc(512);
-	if (parseXml(xml_data, xml_data_size, "<id>", 4, error, 512) < 0) {
-		printf("Error: ID '%d' not found\n", id);
+	struct status status_by_id;
+	if (FindXmlError(xml_data, xml_data_size) < 0 && parseXml(xml_data, xml_data_size, "</status>", 9, NULL, 0) > 0) {
+		status_by_id = makeStatusFromRawSource(xml_data, xml_data_size);
+		*result = 0;
 	}
-	else {
-		struct status status_by_id = makeStatusFromRawSource(xml_data, xml_data_size);
-		print_status(status_by_id);
-	}
-	free(error);
 	free(xml_data);
+	return status_by_id;
 }

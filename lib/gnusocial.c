@@ -81,3 +81,14 @@ void print_status(struct status status_)
 	printf("\033[32m\n%s\n", status_.text);
 	printf("\033[33m%s\n\033[m", status_.date);
 }
+
+int FindXmlError(char *xml_data, int xml_data_size)
+{
+	int ret = 0;
+	char *error = (char *)malloc(512);
+	if ((ret = parseXml(xml_data, xml_data_size, "<error>", 7, error, 512)) > 0) {
+		printf("Error: %s\n", error);
+	}
+	free(error);
+	return ret;
+}

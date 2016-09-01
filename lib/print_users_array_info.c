@@ -23,26 +23,9 @@
 
 void print_users_array_info(struct gss_account account, char *source, int n_users)
 {
-	char url[128];
-	sprintf(url, "%s://%s/api/%s&count=%d", account.protocol, account.server, source, n_users);
-	FILE *xml = fopen("temp/file.xml", "wb");
-	CURL *curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
-        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_xml);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-	fclose(xml);
-	xml = fopen("temp/file.xml", "r");
-	fseek(xml, 0L, SEEK_END);
-	int filesize = ftell(xml);
-	rewind(xml);
-	char *xml_data = (char *)malloc(filesize);
-	fread(xml_data, filesize, filesize, xml);
-	fclose(xml);
+	char count[32];
+	sprintf(count, "count=%d", n_users);
+	char *xml_data = send_to_api(account,count,source);
 	int xml_data_size = strlen(xml_data);
 	char *error = (char *)malloc(512);
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {

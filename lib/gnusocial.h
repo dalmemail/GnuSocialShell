@@ -66,10 +66,11 @@ struct little_group_info {
 /**
  * @brief Downloads the user information from the GnuSocial server
  * @param account A gss_account structure to send the request to the GnuSocial server
+ * @param result An intenger to store if there is an error or not. ZERO if not, Non-ZERO if yes
  * @return The user information as an account_info structure
  */
 
-struct account_info get_my_account_info(struct gss_account account);
+struct account_info get_my_account_info(struct gss_account account, int *result);
 
 /**
  * @brief Post a new notice as the authenticating user
@@ -99,9 +100,11 @@ void unfavorite(struct gss_account account, int id);
  * @brief Prints a single notice, specified by the id parameter
  * @param account A gss_account structure to authenticate the user into the server
  * @param id The notice ID to print
+ * @param result An intenger to store Non-ZERO if there is an error, ZERO if not
+ * @return An status structure with the status information
  */
 
-void search_by_id(struct gss_account account, int id);
+struct status search_by_id(struct gss_account account, int id, int *result);
 
 /**
  * @brief Destroys the notice specified by the required ID parameter
@@ -252,3 +255,21 @@ size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
  */
 
 int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, char *output, int output_size);
+
+/**
+ * @brief Sends a formatted content to the server API
+ * @param account A gss_structure to authenticate into the server
+ * @param send The content to send to the server
+ * @param xml_doc Where to send the content using 'account'
+ */
+
+char *send_to_api(struct gss_account account, char *send, char *xml_doc);
+
+/**
+ * @brief Searchs for error into a especified string using parseXml()
+ * @param xml_data The string with the xml file content returned by the server
+ * @param xml_data_size The size of the string 'xml_data'
+ * @return A positive number if there is an error, -1 if not
+ */
+
+int FindXmlError(char *xml_data, int xml_data_size);
