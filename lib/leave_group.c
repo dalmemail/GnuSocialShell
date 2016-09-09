@@ -23,13 +23,12 @@
 void leave_group(struct gss_account account, int id)
 {
 	char send[16];
-	sprintf(send, "id=%d", id);
+	snprintf(send, 16, "id=%d", id);
 	char *xml_data = send_to_api(account, send, "statusnet/groups/leave.xml");
-	char *error = (char *)malloc(512);
+	char error[512];
 	int xml_data_size = strlen(xml_data);
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
-	free(error);
 	free(xml_data);
 }

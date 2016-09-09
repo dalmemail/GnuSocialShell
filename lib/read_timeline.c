@@ -25,10 +25,10 @@ struct status *read_timeline(struct gss_account account, char *timeline, int n_s
 {
 	struct status *status_list = (struct status*)malloc(n_status * sizeof(struct status));
 	char count[32];
-	sprintf(count, "count=%d", n_status);
+	snprintf(count, 32, "count=%d", n_status);
 	char *xml_data = send_to_api(account,count,timeline);
 	int xml_data_size = strlen(xml_data);
-	char *error = (char *)malloc(512);
+	char error[512];
 	int i;
 	for (i = 0; i < n_status; i++) {
 		status_list[i].id = 0;
@@ -50,6 +50,5 @@ struct status *read_timeline(struct gss_account account, char *timeline, int n_s
 		}
 	}
 	free(xml_data);
-	free(error);
 	return status_list;
 }

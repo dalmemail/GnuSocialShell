@@ -24,37 +24,37 @@
 struct account_info datatoaccount(char *xml_data, int xml_data_size)
 {
 	struct account_info info;
-	char *output = (char *)malloc(512);
+	char output[512];
 	if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) > 0) {
-		strcpy(info.name, output);
+		strncpy(info.name, output, MAX_ACCOUNT_NAME);
 	}
 	else {
 		info.name[0] = '?';
 		info.name[1] = '\0';
 	}
 	if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, output, 512) > 0) {
-		strcpy(info.screen_name, output);
+		strncpy(info.screen_name, output, MAX_SCREEN_NAME);
 	}
 	else {
 		info.name[0] = '?';
 		info.name[1] = '\0';
 	}
 	if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) > 0) {
-		strcpy(info.location, output);
+		strncpy(info.location, output, MAX_LOCATION);
 	}
 	else {
 		info.name[0] = '?';
 		info.name[1] = '\0';
 	}
 	if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
-		strcpy(info.description, output);
+		strncpy(info.description, output, MAX_DESCRIPTION);
 	}
 	else {
 		info.name[0] = '?';
 		info.name[1] = '\0';
 	}
 	if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
-		strcpy(info.url, output);
+		strncpy(info.url, output, MAX_URL);
 	}
 	else {
 		info.name[0] = '?';
@@ -78,14 +78,13 @@ struct account_info datatoaccount(char *xml_data, int xml_data_size)
 	else {
 		info.statuses = -1;
 	}
-	free(output);
 	return info;
 }
 
 struct account_info get_my_account_info(struct gss_account account, int *result)
 {
 	char send[79];
-	sprintf(send, "screen_name=%s", account.user);
+	snprintf(send, 79, "screen_name=%s", account.user);
 	char *xml_data = send_to_api(account, send, "users/show.xml");
 	int xml_data_size = strlen(xml_data);
 	struct account_info info;

@@ -28,12 +28,12 @@
 #define _FALSE 0
 #define _TRUE 1
 
-int get_size(char *path);
-char *read_file(char *path);
+int get_size(const char *path);
+char *read_file(const char *path);
 int linecounter(char *c);
 int parseConfig(char *to_search, char *output, char **lines, int n_lines);
 
-int loadConfig(char *ConfigFilePath)
+int loadConfig(const char *ConfigFilePath)
 {
 	extern struct gss_account main_account;
 	int ret = 0;
@@ -127,7 +127,7 @@ int parseConfig(char *to_search, char *output, char **lines, int n_lines)
 	return ret;
 }
 
-char *read_file(char *path)
+char *read_file(const char *path)
 {
 	int fd;
 	int file_size;
@@ -169,7 +169,7 @@ int linecounter(char *c)
 	return n_lines;
 }
 
-int get_size(char *path)
+int get_size(const char *path)
 {
 	struct stat st;
 	int ssize;

@@ -21,4 +21,4 @@
 /** @param account The struct gss_account to store de config */
 /** @return ZERO if done, Non-ZERO if there is any error */
 
-int loadConfig(char *ConfigFilePath);
+int loadConfig(const char *ConfigFilePath);

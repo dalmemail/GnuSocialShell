@@ -24,10 +24,10 @@
 void print_users_array_info(struct gss_account account, char *source, int n_users)
 {
 	char count[32];
-	sprintf(count, "count=%d", n_users);
+	snprintf(count, 32, "count=%d", n_users);
 	char *xml_data = send_to_api(account,count,source);
 	int xml_data_size = strlen(xml_data);
-	char *error = (char *)malloc(512);
+	char error[512];
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
@@ -54,5 +54,4 @@ void print_users_array_info(struct gss_account account, char *source, int n_user
 		printf("Error: Reading %d users from '%s://%s/api/%s'\n", n_users, account.protocol, account.server, source);
 	}
 	free(xml_data);
-	free(error);
 }

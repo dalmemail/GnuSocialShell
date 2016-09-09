@@ -24,9 +24,11 @@
 #include "loadConfig.h"
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
+#include "lib/constants.h"
 
-#define VERSION "1.0"
+#define VERSION "1.0.1"
 #define MAX_PATH 256
+#define MAX_CMD 4096
 #define _FALSE 0
 #define _TRUE 1
 #define ALL_OK 0
@@ -39,6 +41,8 @@
 #define FOLLOWERS "statuses/followers.xml"
 #define FRIENDS "statuses/friends.xml"
 
+int loglevel=LOG_NONE;
+
 void version();
 void help(char *prog);
 void gss_shell();
@@ -49,7 +53,10 @@ int main(int argc, char **argv)
 {
 	char *home_directory = getenv("HOME");
 	char config_path[MAX_PATH];
-	sprintf(config_path, "%s/.config/gnusocialshell/gnusocialshell.conf", home_directory);
+	char config_path_suffix[] = ".config/gnusocialshell/gnusocialshell.conf";
+	int l = strnlen(home_directory, MAX_PATH);
+	int m = strlen(config_path_suffix);
+	snprintf(config_path, l + m + 2, "%s/%s", home_directory, config_path_suffix);
 	int ret = 0;
 	int vflag = _FALSE;
 	int hflag = _FALSE;
@@ -59,12 +66,15 @@ int main(int argc, char **argv)
 		if ((strcmp(argv[i], "--version") == 0) || (strcmp(argv[i], "-v") == 0)) {
 			vflag = _TRUE;
 		}
+		else if ((strcmp(argv[i], "--debug") == 0) || (strcmp(argv[i], "-d") == 0)) {
+			loglevel = 1;
+		}
 		else if ((strcmp(argv[i], "--help") == 0) || (strcmp(argv[i], "-h") == 0)) {
 			hflag = _TRUE;
 		}
 		else if (((strcmp(argv[i], "--config") == 0) || (strcmp(argv[i], "-c") == 0))) {
 			if ((i+1) < argc) {
-				strcpy(config_path, argv[i+1]);
+				strncpy(config_path, argv[i+1], MAX_PATH);
 				i++;
 			}
 			else {
@@ -86,16 +96,9 @@ int main(int argc, char **argv)
 	}
 	if (!vflag && !hflag && !fflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
-			if (mkdir("temp/", 0777) != -1) {
-				if (verify_account(main_account) != -1) {
-					gss_shell();
-				}
+			if (verify_account(main_account) != -1) {
+				gss_shell();
 			}
-			else {
-				printf("Error: %s\n", strerror(errno));
-			}
-			unlink("temp/file.xml");
-			rmdir("temp/");
 		}
 	}
 	return ret;
@@ -116,21 +119,26 @@ void help(char *prog)
 }
 
 /* compara una cadena de caracteres desde el caracter 0 hasta que encuentra un espacio en blanco
-   o el final de la cadena */
-int cmdcmp(char *a, char *b)
+   o el final de la cadena
+   \param a  some input string
+   \param b  a fixed string
+   \return   0 if b is a prefix of a, except if a has a space somewhere
+*/
+int cmdcmp(const char *a, const char *b)
 {
-	int ret = 0;
-	int max = strlen(a);
+        int ret = 0;
+	int maxb = strlen(b);
+	if (maxb == 0) { return 1; }
 	int i;
-	if (strlen(a) >= strlen(b)) {
-		for (i = 0; i < max && a[i] != ' '; i++) {
-			if (a[i] != b[i]) {
-				ret++;
-			}
-		}
-	}
-	else {
-		ret = 1;
+	for (i = 0; i < maxb; i++) {
+	      /* also returns 1 if a is shorter than b */
+	      if (a[i] != b[i]) {
+		  return 1;
+	      }
+	      /* also returns 1 if a abbreviates(?) b */
+	      if (a[i] == ' ') {
+		  return 1;
+	      }
 	}
 	return ret;
 }
@@ -344,9 +352,9 @@ int executeCommand(char *cmdline)
 		else if (cmdcmp(cmdline, "/ui") == 0) {
 			if (strlen(cmdline) >= 5) {
 				args = &cmdline[4];
-				char screen_name[64];
-				sprintf(screen_name, "&screen_name=%s", args);
-				info = get_user_info(main_account, screen_name);
+				char send_screen_name[79];
+				snprintf(send_screen_name, 79, "&screen_name=%s", args);
+				info = get_user_info(main_account, send_screen_name);
 				if (info.screen_name[0] != '\0') {
 					print_user_info(info);
 				}
@@ -359,7 +367,7 @@ int executeCommand(char *cmdline)
 			if (strlen(cmdline) >= 12) {
 				args = &cmdline[11];
 				char id[16];
-				sprintf(id, "&id=%s", args);
+				snprintf(id, 16, "&id=%s", args);
 				info = get_user_info(main_account, id);
 				if (info.screen_name[0] != '\0') {
 					print_user_info(info);
@@ -457,11 +465,13 @@ int executeCommand(char *cmdline)
 void gss_shell()
 {
 	extern struct gss_account main_account;
-	char *cmdline = (char *)malloc(4096);
+	char *cmdline = (char *)malloc(MAX_CMD);
 	printf("Type '/help' to get a list of commands\n\n");
 	do {
 		printf("@%s@%s-> ", main_account.user, main_account.server);
-		fgets(cmdline, 4096, stdin);
+		fgets(cmdline, MAX_CMD, stdin);
+		cmdline[MAX_CMD-1] = '\0';
+		/* Delete the newline character: */
 		cmdline[strlen(cmdline)-1] = '\0';
 	} while(executeCommand(cmdline) != 0);
 	free(cmdline);

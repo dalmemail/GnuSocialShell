@@ -22,8 +22,9 @@
 
 void send_status(struct gss_account account, char *msg)
 {
-	char *send = malloc(31+strlen(msg));
-	sprintf(send, "source=GnuSocialShell&status=%s", msg);
+        int amount = 31+strlen(msg);
+	char *send = malloc(amount);
+	snprintf(send, amount, "source=GnuSocialShell&status=%s", msg);
 	char *xml_data = send_to_api(account, send, "statuses/update.xml");
 	FindXmlError(xml_data, strlen(xml_data));
 	free(xml_data);
