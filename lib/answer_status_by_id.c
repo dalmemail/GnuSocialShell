@@ -22,10 +22,12 @@
 
 void answer_status_by_id(struct gss_account account, int id, char *msg)
 {
-        int amount = 60+strlen(msg);
+        /* now the ID should always fit, by some margin */
+        int amount = 68+strlen(msg);
 	char *send = malloc(amount);
 	snprintf(send, amount, "in_reply_to_status_id=%d&source=GnuSocialShell&status=%s", id, msg);
-	send[sizeof(send)-1] = '\0'; // snprintf does that too
+	printf("in_reply_to_status_id=%d&source=GnuSocialShell&status=%s\n", id, msg);
+	// send[sizeof(send)-1] = '\0'; // snprintf does that too
 	char *xml_data = send_to_api(account, send, "statuses/update.xml");
 	FindXmlError(xml_data, strlen(xml_data));
 	free(xml_data);
