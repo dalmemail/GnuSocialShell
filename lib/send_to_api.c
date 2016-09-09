@@ -54,8 +54,8 @@ static size_t cb_writeXmlChunk(void *contents, size_t size, size_t nmemb, void *
 char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 {
         CURLcode err;
-	char url[128];
-	sprintf(url, "%s://%s/api/%s", account.protocol, account.server, xml_doc);
+	char url[MAX_URL];
+	snprintf(url, MAX_URL, "%s://%s/api/%s", account.protocol, account.server, xml_doc);
 	struct Chunk xml;
 	xml.memory = (char *)malloc(1);
 	xml.size = 0; 

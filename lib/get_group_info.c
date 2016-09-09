@@ -23,7 +23,7 @@
 struct group_info get_group_info(struct gss_account account, int id)
 {
 	char send[16];
-	sprintf(send, "id=%d", id);
+	snprintf(send, 16, "id=%d", id);
 	char *xml_data = send_to_api(account, send, "statusnet/groups/show.xml");
 	char error[512];
 	char output[512];
