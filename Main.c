@@ -92,16 +92,9 @@ int main(int argc, char **argv)
 	}
 	if (!vflag && !hflag && !fflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
-			if (mkdir("temp/", 0777) != -1) {
-				if (verify_account(main_account) != -1) {
-					gss_shell();
-				}
+			if (verify_account(main_account) != -1) {
+				gss_shell();
 			}
-			else {
-				printf("Error: %s\n", strerror(errno));
-			}
-			unlink("temp/file.xml");
-			rmdir("temp/");
 		}
 	}
 	return ret;

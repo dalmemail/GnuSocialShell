@@ -26,12 +26,39 @@
 
 extern int loglevel;
 
+struct Chunk {
+  char *memory;
+  size_t size;
+};
+
+/* This in-memory cURL callback is from
+   https://curl.haxx.se/libcurl/c/getinmemory.html */
+static size_t cb_writeXmlChunk(void *contents, size_t size, size_t nmemb, void *userp) {
+  size_t realsize = size * nmemb;
+  struct Chunk *mem = (struct Chunk *)userp;
+ 
+  mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+  if(mem->memory == NULL) {
+    /* out of memory! */ 
+    printf("not enough memory (realloc returned NULL)\n");
+    return 0;
+  }
+ 
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+ 
+  return realsize;
+}
+
 char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 {
         CURLcode err;
 	char url[128];
 	sprintf(url, "%s://%s/api/%s", account.protocol, account.server, xml_doc);
-	FILE *xml = fopen("temp/file.xml", "wb");
+	struct Chunk xml;
+	xml.memory = (char *)malloc(1);
+	xml.size = 0; 
 	CURL *curl = curl_easy_init();
 	// libcurl never reads .curlrc:
 	curl_easy_setopt(curl, CURLOPT_CAPATH, "/etc/ssl/certs/" );
@@ -39,8 +66,8 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc)
         curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
         curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, xml);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb_writeXmlChunk);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&xml);
 
 	if (send != NULL) {
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, send);
@@ -66,13 +93,5 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 	}
 
         curl_easy_cleanup(curl);
-	fclose(xml);
-	xml = fopen("temp/file.xml", "r");
-	fseek(xml, 0L, SEEK_END);
-	int filesize = ftell(xml);
-	rewind(xml);
-	char *xml_data = (char *)malloc(filesize);
-	fread(xml_data, filesize, filesize, xml);
-	fclose(xml);
-	return xml_data;
+	return xml.memory;
 }

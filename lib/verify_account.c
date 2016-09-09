@@ -31,7 +31,7 @@ int verify_account(struct gss_account account)
 	int ret = 0;
 	char *xml_data = send_to_api(account, NULL, "account/verify_credentials.xml");
 	int xml_data_size = strlen(xml_data);
-	char *error = (char *)malloc(512);
+	char error[512];
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 		ret = -1;
@@ -54,7 +54,6 @@ int verify_account(struct gss_account account)
 		}
 		ret = -1;
 	}
-	free(error);
 	free(xml_data);
 	return ret;
 }
