@@ -26,7 +26,7 @@ void answer_status_by_id(struct gss_account account, int id, char *msg)
         int amount = 68+strlen(msg);
 	char *send = malloc(amount);
 	snprintf(send, amount, "in_reply_to_status_id=%d&source=GnuSocialShell&status=%s", id, msg);
-	printf("in_reply_to_status_id=%d&source=GnuSocialShell&status=%s\n", id, msg);
+	// printf("in_reply_to_status_id=%d&source=GnuSocialShell&status=%s\n", id, msg);
 	// send[sizeof(send)-1] = '\0'; // snprintf does that too
 	char *xml_data = send_to_api(account, send, "statuses/update.xml");
 	FindXmlError(xml_data, strlen(xml_data));
