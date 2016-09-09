@@ -20,13 +20,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
+
+#include "constants.h"
+
+extern int loglevel;
 
 char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 {
+        CURLcode err;
 	char url[128];
 	sprintf(url, "%s://%s/api/%s", account.protocol, account.server, xml_doc);
 	FILE *xml = fopen("temp/file.xml", "wb");
 	CURL *curl = curl_easy_init();
+	// libcurl never reads .curlrc:
+	curl_easy_setopt(curl, CURLOPT_CAPATH, "/etc/ssl/certs/" );
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
         curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
@@ -37,7 +45,26 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 	if (send != NULL) {
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, send);
 	}
-        curl_easy_perform(curl);
+
+	if (loglevel > LOG_NONE) {
+	        char errbuf[CURL_ERROR_SIZE];
+		err = curl_easy_perform(curl);
+		size_t len = strlen(errbuf);
+		switch (err) {
+		case CURLE_OK:
+  		        break;
+		default:
+		  fprintf(stderr, "\nlibcurl: error (%d) ", err);
+		  if(len)
+		    fprintf(stderr, "%s%s", errbuf,
+			    ((errbuf[len - 1] != '\n') ? "\n" : ""));
+		  else
+		    fprintf(stderr, "%s\n", curl_easy_strerror(err));
+		}
+	} else {
+	        curl_easy_perform(curl);
+	}
+
         curl_easy_cleanup(curl);
 	fclose(xml);
 	xml = fopen("temp/file.xml", "r");
