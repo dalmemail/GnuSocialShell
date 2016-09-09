@@ -26,7 +26,7 @@
 #include "gnusocialshell.h"
 #include "lib/constants.h"
 
-#define VERSION "1.0"
+#define VERSION "1.0.1"
 #define MAX_PATH 256
 #define MAX_CMD 4096
 #define _FALSE 0
