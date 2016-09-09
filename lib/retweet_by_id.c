@@ -22,19 +22,18 @@
 
 void retweet(struct gss_account account, int id, int code)
 {
-	char url[100];
-	sprintf(url, "statuses/retweet/%d.xml", code);
+	char url[MAX_URL];
+	snprintf(url, MAX_URL, "statuses/retweet/%d.xml", code);
 	char id_[32];
-	sprintf(id_, "id=%d", id);
+	snprintf(id_, 32, "id=%d", id);
 	char *xml_data = send_to_api(account,id_,url);
 	int xml_data_size = strlen(xml_data);
-	char *error = (char *)malloc(512);
+	char error[512];
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
 		printf("Error: %s\n", error);
 	}
 	else if (parseXml(xml_data, xml_data_size, "status", 6, "", 0) < 0) {
 		printf("Error: Trying to repeat ID '%d'\n", id);
 	}
-	free(error);
 	free(xml_data);
 } 

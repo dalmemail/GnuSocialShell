@@ -24,7 +24,7 @@
 struct status search_by_id(struct gss_account account, int id, int *result)
 {
 	char xml_doc[32];
-	sprintf(xml_doc, "statuses/show.xml&id=%d", id);
+	snprintf(xml_doc, 32, "statuses/show.xml&id=%d", id);
 	char *xml_data = send_to_api(account,NULL,xml_doc);
 	int xml_data_size = strlen(xml_data);
 	struct status status_by_id;

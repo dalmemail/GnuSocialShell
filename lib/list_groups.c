@@ -22,12 +22,12 @@
 
 struct little_group_info *list_groups(struct gss_account account, int n_groups)
 {
-	char url[128];
-	sprintf(url, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
+	char url[MAX_URL];
+	snprintf(url, MAX_URL, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
 	char count[32];
-	sprintf(count, "count=%d", n_groups);
+	snprintf(count, 32, "count=%d", n_groups);
 	char *xml_data = send_to_api(account,count,"statusnet/groups/list_all.xml");
-	char *error = (char *)malloc(512);
+	char error[512];
 	int xml_data_size = strlen(xml_data);
 	struct little_group_info *groups = (struct little_group_info*)malloc(n_groups * sizeof(struct group_info));
 	int i;
@@ -56,7 +56,6 @@ struct little_group_info *list_groups(struct gss_account account, int n_groups)
 	else {
 		printf("Error: Reading '%d' groups from '%s'\n", n_groups, url);
 	}
-	free(error);
 	free(xml_data);
 	return groups;
 }

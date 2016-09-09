@@ -23,8 +23,8 @@
 struct account_info get_user_info(struct gss_account account, char *source)
 {
 	char *xml_data = send_to_api(account, source, "users/show.xml");
-	char *error = (char *)malloc(512);
-	char *output = (char *)malloc(512);
+	char error[512];
+	char output[512];
 	int xml_data_size = strlen(xml_data);
 	struct account_info info;
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
@@ -33,35 +33,35 @@ struct account_info get_user_info(struct gss_account account, char *source)
 	}
 	else {
 		if (parseXml(xml_data, xml_data_size, "<name>", 6, output, 512) > 0) {
-			strcpy(info.name, output);
+			strncpy(info.name, output, MAX_ACCOUNT_NAME);
 		}
 		else {
 			info.name[0] = '?';
 			info.name[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, output, 512) > 0) {
-			strcpy(info.screen_name, output);
+			strncpy(info.screen_name, output, MAX_SCREEN_NAME);
 		}
 		else {
 			info.screen_name[0] = '?';
 			info.screen_name[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<location>", 10, output, 512) > 0) {
-			strcpy(info.location, output);
+			strncpy(info.location, output, MAX_LOCATION);
 		}
 		else {
 			info.location[0] = '?';
 			info.location[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
-			strcpy(info.description, output);
+			strncpy(info.description, output, MAX_DESCRIPTION);
 		}
 		else {
 			info.description[0] = '?';
 			info.description[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
-			strcpy(info.url, output);
+			strncpy(info.url, output, MAX_URL);
 		}
 		else {
 			info.url[0] = '?';
@@ -86,8 +86,6 @@ struct account_info get_user_info(struct gss_account account, char *source)
 			info.statuses = -1;
 		}
 	}
-	free(output);
-	free(error);
 	free(xml_data);
 	return info;
 }

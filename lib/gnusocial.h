@@ -18,12 +18,14 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "constants.h"
+
 struct account_info {
-	char name[64];
-	char screen_name[64];
-	char location[64];
-	char description[256];
-	char url[128];
+	char name[MAX_ACCOUNT_NAME];
+	char screen_name[MAX_SCREEN_NAME];
+	char location[MAX_LOCATION];
+	char description[MAX_DESCRIPTION];
+	char url[MAX_URL];
 	int followers;
 	int friends;
 	int statuses;
@@ -47,20 +49,20 @@ struct status {
 
 struct group_info {
 	int id;
-	char url[128];
-	char nickname[64];
-	char fullname[64];
+	char url[MAX_URL];
+	char nickname[MAX_GROUP_NICKNAME];
+	char fullname[MAX_GROUP_FULLNAME];
 	/* ZERO if not, Non-ZERO if true */
 	int member;
 	int admins;
 	int members;
-	char description[256];
+	char description[MAX_DESCRIPTION];
 };
 
 struct little_group_info {
 	int id;
-	char nickname[64];
-	char description[256];
+	char nickname[MAX_GROUP_NICKNAME];
+	char description[MAX_DESCRIPTION];
 };
 
 /**

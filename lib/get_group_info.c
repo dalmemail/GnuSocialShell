@@ -25,8 +25,8 @@ struct group_info get_group_info(struct gss_account account, int id)
 	char send[16];
 	sprintf(send, "id=%d", id);
 	char *xml_data = send_to_api(account, send, "statusnet/groups/show.xml");
-	char *error = (char *)malloc(512);
-	char *output = (char *)malloc(512);
+	char error[512];
+	char output[512];
 	int xml_data_size = strlen(xml_data);
 	struct group_info group;
 	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
@@ -36,21 +36,21 @@ struct group_info get_group_info(struct gss_account account, int id)
 	else {
 		group.id = id;
 		if (parseXml(xml_data, xml_data_size, "<url>", 5, output, 512) > 0) {
-			strcpy(group.url, output);
+			strncpy(group.url, output, MAX_URL);
 		}
 		else {
 			group.url[0] = '?';
 			group.url[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<nickname>", 10, output, 512) > 0) {
-			strcpy(group.nickname, output);
+			strncpy(group.nickname, output, MAX_GROUP_NICKNAME);
 		}
 		else {
 			group.nickname[0] = '?';
 			group.nickname[1] = '\0';
 		}
 		if (parseXml(xml_data, xml_data_size, "<fullname>", 10, output, 512) > 0) {
-			strcpy(group.fullname, output);
+			strncpy(group.fullname, output, MAX_GROUP_FULLNAME);
 		}
 		else {
 			group.fullname[0] = '?';
@@ -80,15 +80,13 @@ struct group_info get_group_info(struct gss_account account, int id)
 			group.members = -1;
 		}
 		if (parseXml(xml_data, xml_data_size, "<description>", 13, output, 512) > 0) {
-			strcpy(group.description, output);
+			strncpy(group.description, output, MAX_DESCRIPTION);
 		}
 		else {
 			group.description[0] = '?';
 			group.description[1] = '\0';
 		}
 	}
-	free(output);
-	free(error);
 	free(xml_data);
 	return group;
 }

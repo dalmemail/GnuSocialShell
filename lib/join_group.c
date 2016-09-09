@@ -21,8 +21,8 @@
 
 void join_group(struct gss_account account, int id)
 {
-	char send[12];
-	sprintf(send, "id=%d", id);
+	char send[16];
+	snprintf(send, 16, "id=%d", id);
 	char *xml_data = send_to_api(account, send, "statusnet/groups/join.xml");
 	FindXmlError(xml_data, strlen(xml_data));
 	free(xml_data);

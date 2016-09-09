@@ -32,9 +32,7 @@ int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, c
 	int start_pos = 0;
 	int ret = -1;
 	int i;
-	for (i = 0; i < output_size; i++) {
-		output[i] = '\0';
-	}
+	memset(output, '\0', output_size);
 	for (i = pos; act_pos != tofind_size && i < xml_data_size; i++) {
 		if (tofind[act_pos] == xml_data[i]) {
 			act_pos++;
@@ -60,7 +58,7 @@ int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, c
 struct status makeStatusFromRawSource(char *raw_data, int data_size)
 {
 	struct status out_status;
-	char *buffer = (char *)malloc(16);
+	char buffer[16];
 	parseXml(raw_data, data_size, "<text>", 6, out_status.text, 1024);
 	parseXml(raw_data, data_size, "<id>", 4, buffer, 16);
 	out_status.id = atoi(buffer);
@@ -85,10 +83,9 @@ void print_status(struct status status_)
 int FindXmlError(char *xml_data, int xml_data_size)
 {
 	int ret = 0;
-	char *error = (char *)malloc(512);
+	char error[512];
 	if ((ret = parseXml(xml_data, xml_data_size, "<error>", 7, error, 512)) > 0) {
 		printf("Error: %s\n", error);
 	}
-	free(error);
 	return ret;
 }
