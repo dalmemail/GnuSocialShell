@@ -21,6 +21,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ctype.h>
+#include "constants.h"
+
+extern int loglevel;
+
 int verify_account(struct gss_account account)
 {
 	int ret = 0;
@@ -33,6 +38,20 @@ int verify_account(struct gss_account account)
 	}
 	else if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, "", 0) < 0) {
 		printf("Error: Conecting to @%s@%s\n", account.user, account.server);
+		if (loglevel>=LOG_DEBUG) {
+		    for (int i = 0; i < xml_data_size; ++i) {
+		      if (xml_data[i] == '\0') break;
+		      /* fprintf(stderr, "%02x ", (unsigned char)xml_data[i]); */
+		      if (xml_data[i] == '\\') {
+		      	fprintf(stderr, "\\\\");
+		      } else if (isprint(xml_data[i])) {
+		      	fprintf(stderr, "%c", (unsigned char)xml_data[i]);
+		      } else {
+		      	fprintf(stderr, "\\x%2x", (unsigned char)xml_data[i]);
+		      }
+		    }
+		    fprintf(stderr, "\n");
+		}
 		ret = -1;
 	}
 	free(error);

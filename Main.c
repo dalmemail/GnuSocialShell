@@ -24,6 +24,7 @@
 #include "loadConfig.h"
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
+#include "lib/constants.h"
 
 #define VERSION "1.0"
 #define MAX_PATH 256
@@ -38,6 +39,8 @@
 
 #define FOLLOWERS "statuses/followers.xml"
 #define FRIENDS "statuses/friends.xml"
+
+int loglevel=LOG_NONE;
 
 void version();
 void help(char *prog);
@@ -58,6 +61,9 @@ int main(int argc, char **argv)
 	for (i = 1; i < argc; i++) {
 		if ((strcmp(argv[i], "--version") == 0) || (strcmp(argv[i], "-v") == 0)) {
 			vflag = _TRUE;
+		}
+		else if ((strcmp(argv[i], "--debug") == 0) || (strcmp(argv[i], "-d") == 0)) {
+			loglevel = 1;
 		}
 		else if ((strcmp(argv[i], "--help") == 0) || (strcmp(argv[i], "-h") == 0)) {
 			hflag = _TRUE;
