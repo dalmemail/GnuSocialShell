@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,11 +28,17 @@
 #include "gnusocialshell.h"
 #include "lib/constants.h"
 
-
+#ifdef HAVE_READLINE_H
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 // #define VERSION "1.0.2" // -> config.h
 #define MAX_PATH 256
 #define MAX_CMD 4096
+#ifdef HAVE_READLINE_H
+#define MAX_PROMPT 256
+#endif
 #define _FALSE 0
 #define _TRUE 1
 #define ALL_OK 0
@@ -468,14 +476,33 @@ int executeCommand(char *cmdline)
 void gss_shell()
 {
 	extern struct gss_account main_account;
-	char *cmdline = (char *)malloc(MAX_CMD);
+#ifdef HAVE_READLINE_H
+	char *input;
+	char prompt[MAX_PROMPT];
+	snprintf(prompt, MAX_PROMPT,
+		 "@%s@%s-> ", main_account.user, main_account.server); 
+#endif
+	char cmdline[MAX_CMD];
 	printf("Type '/help' to get a list of commands\n\n");
 	do {
+#ifdef HAVE_READLINE_H
+	        input = readline(prompt);
+		add_history(input);
+#else
 		printf("@%s@%s-> ", main_account.user, main_account.server);
 		fgets(cmdline, MAX_CMD, stdin);
+#endif
 		cmdline[MAX_CMD-1] = '\0';
 		/* Delete the newline character: */
 		cmdline[strlen(cmdline)-1] = '\0';
-	} while(executeCommand(cmdline) != 0);
-	free(cmdline);
+	} while(
+#ifdef HAVE_READLINE_H
+		executeCommand(input) != 0
+#else
+		executeCommand(cmdline) != 0
+#endif
+		);
+#ifdef HAVE_READLINE_H
+	free(input);
+#endif
 }
