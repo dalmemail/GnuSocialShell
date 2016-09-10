@@ -55,6 +55,8 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 {
         CURLcode err;
 	char url[MAX_URL];
+	char userpwd[129];
+	snprintf(userpwd, 129, "%s:%s", account.user, account.password);
 	snprintf(url, MAX_URL, "%s://%s/api/%s", account.protocol, account.server, xml_doc);
 	struct Chunk xml;
 	xml.memory = (char *)malloc(1);
@@ -63,8 +65,7 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc)
 	// libcurl never reads .curlrc:
 	curl_easy_setopt(curl, CURLOPT_CAPATH, "/etc/ssl/certs/" );
         curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, account.user);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, account.password);
+        curl_easy_setopt(curl, CURLOPT_USERPWD, userpwd);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb_writeXmlChunk);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&xml);
