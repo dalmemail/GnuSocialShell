@@ -26,7 +26,9 @@
 #include "gnusocialshell.h"
 #include "lib/constants.h"
 
-#define VERSION "1.0.1"
+
+
+// #define VERSION "1.0.2" // -> config.h
 #define MAX_PATH 256
 #define MAX_CMD 4096
 #define _FALSE 0
@@ -113,6 +115,7 @@ void help(char *prog)
 {
 	printf("Usage: %s [OPTION]\n", prog);
 	printf("--help, -h\t\tPrints this help\n");
+	printf("--debug, -d\t\tPrints extra debug messages\n");
 	printf("--version, -v\t\tPrints GnuSocialShell version\n");
 	printf("--config, -c [FILE]\tUse FILE as configuration file\n");
 	printf("\nWritten by DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
