@@ -12,3 +12,9 @@ LDADD += $(LIBCURL)
 #if USE_READLINE
 LDADD += $(LIBREADLINE)
 #endif
+
+initconfig:
+	test -d $(HOME)/.config/gnusocialshell || mkdir $(HOME)/.config/gnusocialshell
+	chmod -R 700 $(HOME)/.config/gnusocialshell
+	install --backup -v -Dm644 config $(DESTDIR)$(HOME)/.config/gnusocialshell/gnusocialshell.conf
+
