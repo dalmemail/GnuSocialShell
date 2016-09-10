@@ -39,7 +39,8 @@ int verify_account(struct gss_account account)
 	else if (parseXml(xml_data, xml_data_size, "<screen_name>", 13, "", 0) < 0) {
 		printf("Error: Conecting to @%s@%s\n", account.user, account.server);
 		if (loglevel>=LOG_DEBUG) {
-		    for (int i = 0; i < xml_data_size; ++i) {
+		    int i;
+		    for (i = 0; i < xml_data_size; ++i) {
 		      if (xml_data[i] == '\0') break;
 		      /* fprintf(stderr, "%02x ", (unsigned char)xml_data[i]); */
 		      if (xml_data[i] == '\\') {
