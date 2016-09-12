@@ -20,13 +20,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <curl/curl.h>
+
+extern int loglevel;
+
 void send_status(struct gss_account account, char *msg)
 {
-        int amount = 31+strlen(msg);
-	char *send = malloc(amount);
-	snprintf(send, amount, "source=GnuSocialShell&status=%s", msg);
-	char *xml_data = send_to_api(account, send, "statuses/update.xml");
-	FindXmlError(xml_data, strlen(xml_data));
-	free(xml_data);
-	free(send);
+        /* cURL functionality used just to URIencode the msg */
+        CURL *curl = curl_easy_init();
+	if(curl) {
+                char *encoded_msg = curl_easy_escape(curl, msg, strlen(msg));
+		if(encoded_msg) {
+                        int amount = 31+strlen(encoded_msg);
+			char *send = malloc(amount);
+			snprintf(send, amount, "source=GnuSocialShell&status=%s", encoded_msg);
+			if (loglevel >= LOG_DEBUG) { // OK?
+			        fprintf(stderr, "source=GnuSocialShell&status=%s", encoded_msg);
+			}
+			char *xml_data = send_to_api(account, send, "statuses/update.xml");
+			FindXmlError(xml_data, strlen(xml_data));
+			free(xml_data);
+			free(send);
+			curl_free(encoded_msg);
+		}
+	}
 }

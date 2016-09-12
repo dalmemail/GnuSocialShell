@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 			vflag = _TRUE;
 		}
 		else if ((strcmp(argv[i], "--debug") == 0) || (strcmp(argv[i], "-d") == 0)) {
-			loglevel = 1;
+			loglevel = LOG_DEBUG;
 		}
 		else if ((strcmp(argv[i], "--help") == 0) || (strcmp(argv[i], "-h") == 0)) {
 			hflag = _TRUE;
