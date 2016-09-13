@@ -10,6 +10,9 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 
 
 #### Compile
+      $ touch config.rpath
+      $ autoreconf -iv
+      $ ./configure --prefix=/usr/local
       $ make
 
 #### Execute
