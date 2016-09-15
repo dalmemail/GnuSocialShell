@@ -10,16 +10,19 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 
 
 #### Compile
+      $ touch config.rpath
+      $ autoreconf -iv
+      $ ./configure --prefix=/usr/local
       $ make
 
 #### Execute
-      $ ./gss
+      $ ./gnusocialshell
 
 ### How to make a Configuration File
 
 First we have to open the file "config" using nano (or another text editor)
 
-                  $ nano config
+      $ nano config
 
 #### We will get something like:
       #Default Config file for GnuSocialShell
