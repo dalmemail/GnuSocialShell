@@ -235,17 +235,6 @@ struct status makeStatusFromRawSource(char *raw_data, int data_size);
 void print_status(struct status status_);
 
 /**
- * @brief Writes data to a espeficied file
- * @param ptr Data to write
- * @param size 'ptr' size
- * @param nmemb Size to write to 'stream'
- * @param stream The file to write 'ptr'
- * @return The number of bytes correctly wrote to 'stream'
- */
-
-size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
-
-/**
  * @brief Find a tag into a xml raw file and copy content
  * @param xml_data The raw xml file content
  * @param xml_data_size The xml_data size or size to search in
