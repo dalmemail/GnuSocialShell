@@ -20,11 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-	size_t written = fwrite(ptr, size, nmemb, stream);
-	return written;
-}
-
 int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, char *output, int output_size)
 {
 	int pos = 0;
