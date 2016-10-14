@@ -51,6 +51,9 @@
 #define FOLLOWERS "statuses/followers.xml"
 #define FRIENDS "statuses/friends.xml"
 
+#define USER_GROUPS 0
+#define SERVER_GROUPS 1
+
 int loglevel=LOG_NONE;
 
 void version();
@@ -400,6 +403,47 @@ int executeCommand(char *cmdline)
 				print_users_array_info(main_account, FRIENDS, info.friends);
 			}
 		}
+		else if (cmdcmp(cmdline, "/group_timeline") == 0) {
+			if (strlen(cmdline) >= 17) {
+				args = &cmdline[16];
+				int cmdline_size = strlen(cmdline);
+				for (i = 16; i < cmdline_size && cmdline[i] != ' '; i++);
+				if ((i+1) < cmdline_size && cmdline[i] == ' ') {
+					cmdline[i] = '\0';
+					char *count = &cmdline[i+1];
+					int n_status = atoi(count);
+					char g_timeline[256];
+					sprintf(g_timeline, "statusnet/groups/timeline/%s.xml", args);
+					if (n_status > 0) {
+						struct status *status_list = read_timeline(main_account, g_timeline, n_status);
+						for (i = 0; i < n_status; i++) {
+							if (status_list[i].id != 0) {
+								print_status(status_list[i]);
+							}
+						}
+						free(status_list);
+					}
+				}
+				else {
+					printf("Error: Invalid usage, see '/help group' for details\n");
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help group' for details\n");
+			}
+		}
+		else if (cmdcmp(cmdline, "/groups") == 0) {
+			int n_groups = get_number_of_groups(main_account);
+			if (n_groups > 0) {
+				struct little_group_info *groups = list_groups(main_account, n_groups, USER_GROUPS);
+				for (i = 0; i < n_groups; i++) {
+					if (groups[i].id != 0) {
+						print_little_group_info(groups[i]);
+					}
+				}
+				free(groups);
+			}
+		}
 		else if (cmdcmp(cmdline, "/group") == 0) {
 			if (strlen(cmdline) >= 8) {
 				args = &cmdline[7];
@@ -422,7 +466,7 @@ int executeCommand(char *cmdline)
 					args = &cmdline[12];
 					int n_groups = atoi(args);
 					if (n_groups > 0) {
-						struct little_group_info *groups = list_groups(main_account, n_groups);
+						struct little_group_info *groups = list_groups(main_account, n_groups, SERVER_GROUPS);
 						for (i = 0; i < n_groups; i++) {
 							if (groups[i].id != 0) {
 								print_little_group_info(groups[i]);

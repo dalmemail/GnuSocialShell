@@ -94,6 +94,7 @@ void help_command(char *args)
 		printf("/followers_list\t\t\tPrints the people who is following you\n");
 		printf("/friends_list\t\t\tPrints the people you are following\n");
 		printf("/group\t\t\t\tThe same that '/help group'\n");
+		printf("/groups\t\t\t\tPrints information about the groups in which you are\n");
 		printf("/start_follow [SCREEN_NAME]\tFollow one user using its SCREEN_NAME\n");
 		printf("/sf [SCREEN_NAME]\t\tThe same that /start_follow\n");
 		printf("/stop_follow [SCREEN_NAME]\tUn-Follow one user using its SCREEN_NAME\n");
@@ -104,6 +105,7 @@ void help_command(char *args)
 		printf("/group join [ID]\t\tSubscrite to the given group\n");
 		printf("/group leave [ID]\t\tLeave the given group\n");
 		printf("/group list [NUMBER]\t\tPrints detailed information of 'NUMBER' groups\n");
+		printf("/group_timeline [ID] [NUMBER]\tDownloads 'NUMBER' status from a group called by it 'ID'\n");
 	}
 	else {
 		printf("No such help for '%s'\n", args);

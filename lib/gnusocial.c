@@ -84,3 +84,20 @@ int FindXmlError(char *xml_data, int xml_data_size)
 	}
 	return ret;
 }
+
+int get_number_of_groups(struct gss_account account)
+{
+	char source[128];
+	sprintf(source, "&screen_name=%s", account.user);
+	char *xml_data = send_to_api(account, source, "users/show.xml");
+	char error[512];
+	char n_groups[32] = "0";
+	int xml_data_size = strlen(xml_data);
+	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
+		printf("Error: %s\n", error);
+	}
+	else {
+		parseXml(xml_data, xml_data_size, "<groups_count>", 14, n_groups, 32);
+	}
+	return atoi(n_groups);
+}
