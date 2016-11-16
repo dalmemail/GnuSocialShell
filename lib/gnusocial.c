@@ -20,11 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-	size_t written = fwrite(ptr, size, nmemb, stream);
-	return written;
-}
-
 int parseXml(char *xml_data, int xml_data_size, char *tofind, int tofind_size, char *output, int output_size)
 {
 	int pos = 0;
@@ -88,4 +83,21 @@ int FindXmlError(char *xml_data, int xml_data_size)
 		printf("Error: %s\n", error);
 	}
 	return ret;
+}
+
+int get_number_of_groups(struct gss_account account)
+{
+	char source[128];
+	sprintf(source, "&screen_name=%s", account.user);
+	char *xml_data = send_to_api(account, source, "users/show.xml");
+	char error[512];
+	char n_groups[32] = "0";
+	int xml_data_size = strlen(xml_data);
+	if (parseXml(xml_data, xml_data_size, "<error>", 7, error, 512) > 0) {
+		printf("Error: %s\n", error);
+	}
+	else {
+		parseXml(xml_data, xml_data_size, "<groups_count>", 14, n_groups, 32);
+	}
+	return atoi(n_groups);
 }

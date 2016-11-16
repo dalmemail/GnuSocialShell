@@ -189,10 +189,11 @@ void leave_group(struct gss_account account, int id);
  * @brief Gets little information of a number of groups especified by a 'n_groups'
  * @param account A gss_account structure to authenticate the user into the server
  * @param n_groups The number of groups to be readed
+ * @param group_timeline Can be USER_GROUPS (ZERO) or SERVER_GROUPS (1)
  * @return An array of little_group_info structures with all the info
  */
 
-struct little_group_info *list_groups(struct gss_account account, int n_groups);
+struct little_group_info *list_groups(struct gss_account account, int n_groups, int group_timeline);
 
 /**
  * @brief Start to follow a user especified by its screen_name
@@ -235,17 +236,6 @@ struct status makeStatusFromRawSource(char *raw_data, int data_size);
 void print_status(struct status status_);
 
 /**
- * @brief Writes data to a espeficied file
- * @param ptr Data to write
- * @param size 'ptr' size
- * @param nmemb Size to write to 'stream'
- * @param stream The file to write 'ptr'
- * @return The number of bytes correctly wrote to 'stream'
- */
-
-size_t save_xml(void *ptr, size_t size, size_t nmemb, FILE *stream);
-
-/**
  * @brief Find a tag into a xml raw file and copy content
  * @param xml_data The raw xml file content
  * @param xml_data_size The xml_data size or size to search in
@@ -275,3 +265,11 @@ char *send_to_api(struct gss_account account, char *send, char *xml_doc);
  */
 
 int FindXmlError(char *xml_data, int xml_data_size);
+
+/**
+ * @brief Returns the number of groups in which "account" is
+ * @param account A gss_account structure to authenticate the user into the server
+ * @return The number of groups in which "account" is, or ZERO if fail
+ */
+
+int get_number_of_groups(struct gss_account account);

@@ -20,13 +20,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct little_group_info *list_groups(struct gss_account account, int n_groups)
+#define USER_GROUPS 0
+#define SERVER_GROUPS 1
+
+char timelines[2][64] = {"statusnet/groups/list.xml", "statusnet/groups/list_all.xml"};
+
+struct little_group_info *list_groups(struct gss_account account, int n_groups, int group_timeline)
 {
-	char url[MAX_URL];
-	snprintf(url, MAX_URL, "%s://%s/api/statusnet/groups/list_all.xml", account.protocol, account.server);
 	char count[32];
 	snprintf(count, 32, "count=%d", n_groups);
-	char *xml_data = send_to_api(account,count,"statusnet/groups/list_all.xml");
+	char *xml_data = send_to_api(account,count,timelines[group_timeline]);
 	char error[512];
 	int xml_data_size = strlen(xml_data);
 	struct little_group_info *groups = (struct little_group_info*)malloc(n_groups * sizeof(struct group_info));
@@ -54,7 +57,7 @@ struct little_group_info *list_groups(struct gss_account account, int n_groups)
 		}
 	}
 	else {
-		printf("Error: Reading '%d' groups from '%s'\n", n_groups, url);
+		printf("Error: Reading '%d' groups from '%s:%s/api/%s'\n", n_groups, account.protocol, account.server, timelines[group_timeline]);
 	}
 	free(xml_data);
 	return groups;
