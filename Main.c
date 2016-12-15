@@ -413,7 +413,7 @@ int executeCommand(char *cmdline)
 					char *count = &cmdline[i+1];
 					int n_status = atoi(count);
 					char g_timeline[256];
-					sprintf(g_timeline, "statusnet/groups/timeline/%s.xml", args);
+					snprintf(g_timeline, 256, "statusnet/groups/timeline/%s.xml", args);
 					if (n_status > 0) {
 						struct status *status_list = read_timeline(main_account, g_timeline, n_status);
 						for (i = 0; i < n_status; i++) {

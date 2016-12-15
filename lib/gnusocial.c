@@ -88,7 +88,7 @@ int FindXmlError(char *xml_data, int xml_data_size)
 int get_number_of_groups(struct gss_account account)
 {
 	char source[128];
-	sprintf(source, "&screen_name=%s", account.user);
+	snprintf(source, 128, "&screen_name=%s", account.user);
 	char *xml_data = send_to_api(account, source, "users/show.xml");
 	char error[512];
 	char n_groups[32] = "0";
