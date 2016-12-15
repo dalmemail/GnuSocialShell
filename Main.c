@@ -525,20 +525,31 @@ void gss_shell()
 	char prompt[MAX_PROMPT];
 	snprintf(prompt, MAX_PROMPT,
 		 "@%s@%s-> ", main_account.user, main_account.server); 
-#endif
+#else
 	char cmdline[MAX_CMD];
+#endif
 	printf("Type '/help' to get a list of commands\n\n");
 	do {
 #ifdef HAVE_READLINE_H
 	        input = readline(prompt);
+		if (!input) {
+		  // Quit on failure (which means EOF)
+		  printf("\n");
+		  break;
+		}
 		add_history(input);
 #else
 		printf("@%s@%s-> ", main_account.user, main_account.server);
-		fgets(cmdline, MAX_CMD, stdin);
-#endif
+		if( fgets(cmdline, MAX_CMD, stdin) == NULL) {
+		  // Quit on failure (which means EOF)
+		  printf("\n");
+		  break;
+		}
+
 		cmdline[MAX_CMD-1] = '\0';
 		/* Delete the newline character: */
 		cmdline[strlen(cmdline)-1] = '\0';
+#endif
 	} while(
 #ifdef HAVE_READLINE_H
 		executeCommand(input) != 0
