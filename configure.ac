@@ -1,4 +1,4 @@
-AC_INIT([GnuSocialShell], [1.1], [DalmeGNU])
+AC_INIT([GnuSocialShell], [1.1.1], [DalmeGNU])
 
 AM_INIT_AUTOMAKE([subdir-objects])
 
