@@ -62,8 +62,71 @@ void gss_shell();
 
 struct gss_account main_account;
 
+#ifdef HAVE_READLINE_H
+char *command_names[] = {
+        "/help",
+	"/quit",
+	"/me",
+	"/send",
+	"/favorite",
+	"/unfavorite",
+	"/search",
+	"/delete",
+	"/reply",
+	"/favorites",
+	"/mentions",
+	"/home_timeline",
+	"/ht",
+	"/public_timeline",
+	"/pt",
+	"/rt",
+	"/user_info",
+	"/ui",
+	"/followers_list",
+	"/friends_list",
+	"/group",
+	"/groups",
+	"/start_follow",
+	"/sf",
+	"/stop_follow",
+	NULL
+};
+
+// Readline API: state == 0 means it's a new word
+char* gss_command_generator(const char* text, int state)
+{
+        static int i, len;
+	char *name;
+	
+	if (!state) {
+	        i = 0;
+		len = strlen(text);
+	}
+  
+	// Return names in turn
+	while ((name = command_names[i++]) != 0) {
+		if (strncmp(name, text, len) == 0)
+		return (strdup(name));
+	}
+
+	return ((char *)NULL);
+}
+
+char **gss_command_completion(const char *text, int start, int end)
+{
+        // don't attempt any default (filesystem path) completion
+        rl_attempted_completion_over = 1;
+	// only attempt to complete commands when starting completion of something from begin of input line
+	if (start > 0) return NULL;
+	return rl_completion_matches(text, gss_command_generator);
+}
+#endif
+
 int main(int argc, char **argv)
 {
+#ifdef HAVE_READLINE_H
+        rl_attempted_completion_function = gss_command_completion;
+#endif
 	char *home_directory = getenv("HOME");
 	char config_path[MAX_PATH];
 	char config_path_suffix[] = ".config/gnusocialshell/gnusocialshell.conf";
@@ -413,7 +476,7 @@ int executeCommand(char *cmdline)
 					char *count = &cmdline[i+1];
 					int n_status = atoi(count);
 					char g_timeline[256];
-					sprintf(g_timeline, "statusnet/groups/timeline/%s.xml", args);
+					snprintf(g_timeline, 256, "statusnet/groups/timeline/%s.xml", args);
 					if (n_status > 0) {
 						struct status *status_list = read_timeline(main_account, g_timeline, n_status);
 						for (i = 0; i < n_status; i++) {
@@ -525,20 +588,34 @@ void gss_shell()
 	char prompt[MAX_PROMPT];
 	snprintf(prompt, MAX_PROMPT,
 		 "@%s@%s-> ", main_account.user, main_account.server); 
-#endif
+#else
 	char cmdline[MAX_CMD];
+#endif
 	printf("Type '/help' to get a list of commands\n\n");
 	do {
 #ifdef HAVE_READLINE_H
 	        input = readline(prompt);
+		if (!input) {
+		  // Quit on failure (which means EOF)
+		  printf("\n");
+		  break;
+		}
+
+		rl_bind_key('\t',rl_complete);
+
 		add_history(input);
 #else
 		printf("@%s@%s-> ", main_account.user, main_account.server);
-		fgets(cmdline, MAX_CMD, stdin);
-#endif
+		if( fgets(cmdline, MAX_CMD, stdin) == NULL) {
+		  // Quit on failure (which means EOF)
+		  printf("\n");
+		  break;
+		}
+
 		cmdline[MAX_CMD-1] = '\0';
 		/* Delete the newline character: */
 		cmdline[strlen(cmdline)-1] = '\0';
+#endif
 	} while(
 #ifdef HAVE_READLINE_H
 		executeCommand(input) != 0
