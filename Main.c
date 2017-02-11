@@ -214,7 +214,7 @@ int cmdcmp(const char *a, const char *b)
 	      }
 	}
 	/* also returns 1 if a prefix is longer than b */
-	if (a[i] != ' ') ret = 1;
+	if (strlen(a) > maxb && a[i] != ' ') ret = 1;
 	return ret;
 }
 
