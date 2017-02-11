@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Dan Rulos.
+ * Copyright (C) 2016, 2017 Daniel Martín
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -205,18 +205,16 @@ int cmdcmp(const char *a, const char *b)
 {
         int ret = 0;
 	int maxb = strlen(b);
-	if (maxb == 0) { return 1; }
+	if (maxb == 0) ret = 1;
 	int i;
-	for (i = 0; i < maxb; i++) {
-	      /* also returns 1 if a is shorter than b */
+	for (i = 0; i < maxb && ret == 0; i++) {
+	      /* returns 1 if caracter 'i' on a is not equal to caracter 'i' on b */
 	      if (a[i] != b[i]) {
-		  return 1;
-	      }
-	      /* also returns 1 if a abbreviates(?) b */
-	      if (a[i] == ' ') {
-		  return 1;
+		  ret = 1;
 	      }
 	}
+	/* also returns 1 if a prefix is longer than b */
+	if (a[i] != ' ') ret = 1;
 	return ret;
 }
 
