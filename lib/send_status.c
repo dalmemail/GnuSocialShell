@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Dan Rulos.
+ * Copyright (C) 2016, 2017 Daniel Martín
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,12 @@ void send_status(struct gss_account account, char *msg)
 			        fprintf(stderr, "source=GnuSocialShell&status=%s", encoded_msg);
 			}
 			char *xml_data = send_to_api(account, send, "statuses/update.xml");
-			FindXmlError(xml_data, strlen(xml_data));
+			int xml_data_size = strlen(xml_data);
+			if (FindXmlError(xml_data, strlen(xml_data)) < 0 && parseXml(xml_data, xml_data_size, "</status>", 9, NULL, 0) > 0) {
+				struct status posted_status;
+				posted_status = makeStatusFromRawSource(xml_data, xml_data_size);
+				print_status(posted_status);
+			}
 			free(xml_data);
 			free(send);
 			curl_free(encoded_msg);
