@@ -8,6 +8,10 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 
 - libcurl-dev
 
+#### Optional
+
+- libreadline-dev (for TAB-autocompletion)
+
 
 #### Compile
       $ touch config.rpath
