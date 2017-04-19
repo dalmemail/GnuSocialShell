@@ -1,5 +1,5 @@
- /*
- * Copyright (C) 2016 Dan Rulos.
+/*
+ * Copyright (C) 2016, 2017 Daniel Martín
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Using a account_info structure it prints user information (followers, friends, number of status, etc). Nothing will be returned (void) */
 void print_user_info(struct account_info info);
 
+/* The same as print_user_info(), but instead of printing user information it prints group information from a "group_info" structure */
 void print_group_info(struct group_info group);
 
+/* Prints a little information about a group (nick, id and description) from a "little_group_info" structure */
 void print_little_group_info(struct little_group_info group);
-
-void help_command(char *args);
