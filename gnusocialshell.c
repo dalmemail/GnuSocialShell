@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Dan Rulos.
+ * Copyright (C) 2016, 2017 Daniel Martín
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,46 +68,4 @@ void print_group_info(struct group_info group)
 void print_little_group_info(struct little_group_info group)
 {
 	printf("\033[36m!%s\033[31m (ID %d)\n\033[32m%s\n\033[m", group.nickname, group.id, group.description);
-}
-
-void help_command(char *args)
-{
-	if (args == NULL) {
-		printf("/help\t\t\t\tPrints this help\n");
-		printf("/quit\t\t\t\tClose GnuSocialShell\n");
-		printf("/me\t\t\t\tPrints account information\n");
-		printf("/send [MESSAGE]\t\t\tSend MESSAGE to GnuSocial\n");
-		printf("/favorite [ID]\t\t\tFavorites the status ID\n");
-		printf("/unfavorite [ID]\t\tDelete the status ID from the favorites list\n");
-		printf("/search [ID]\t\t\tFind one status using its ID\n");
-		printf("/delete [ID]\t\t\tDelete one status using its ID\n");
-		printf("/reply [ID] [MESSAGE]\t\tSend MESSAGE as a reply of status ID\n");
-		printf("/favorites [NUMBER]\t\tDownloads 'NUMBER' favorites from favorites list\n");
-		printf("/mentions [NUMBER]\t\tDownloads 'NUMBER' mentions\n");
-		printf("/home_timeline [NUMBER]\t\tDownloads 'NUMBER' status from Home Timeline\n");
-		printf("/ht [NUMBER]\t\t\tThe same that /home_timeline\n");
-		printf("/public_timeline [NUMBER]\tDownloads 'NUMBER' status from Public Timeline\n");
-		printf("/pt [NUMBER]\t\t\tThe same that /public_timeline\n");
-		printf("/rt [ID]\t\t\tRepeat the notice 'ID'\n");
-		printf("/user_info [ID]\t\t\tPrints user detailed information using its ID\n");
-		printf("/ui [SCREEN_NAME]\t\tPrints user detailes information using its screen_name\n");
-		printf("/followers_list\t\t\tPrints the people who is following you\n");
-		printf("/friends_list\t\t\tPrints the people you are following\n");
-		printf("/group\t\t\t\tThe same that '/help group'\n");
-		printf("/groups\t\t\t\tPrints information about the groups in which you are\n");
-		printf("/start_follow [SCREEN_NAME]\tFollow one user using its SCREEN_NAME\n");
-		printf("/sf [SCREEN_NAME]\t\tThe same that /start_follow\n");
-		printf("/stop_follow [SCREEN_NAME]\tUn-Follow one user using its SCREEN_NAME\n");
-		//printf("/notifications\t\t\tPrints latest notifications\n");
-	}
-	else if (strcmp(args, "group") == 0) {
-		printf("/group show [ID]\t\tPrints group detailed information using its ID\n");
-		printf("/group join [ID]\t\tSubscrite to the given group\n");
-		printf("/group leave [ID]\t\tLeave the given group\n");
-		printf("/group list [NUMBER]\t\tPrints detailed information of 'NUMBER' groups\n");
-		printf("/group_timeline [ID] [NUMBER]\tDownloads 'NUMBER' status from a group called by it 'ID'\n");
-	}
-	else {
-		printf("No such help for '%s'\n", args);
-	}
 }
