@@ -27,6 +27,7 @@
 #include "lib/gnusocial.h"
 #include "gnusocialshell.h"
 #include "lib/constants.h"
+#include "help.h"
 
 #ifdef HAVE_READLINE_H
 #include <readline/readline.h>
@@ -251,11 +252,14 @@ int executeCommand(char *cmdline)
 	struct account_info info;
 	if (argc > 0) {
 		if (cmpCmdString(argv[0], "/help")) {
-			if (argc > 1) {
-				help_command(argv[1]);
+			if (argc == 2) {
+				help_(argv[1]);
+			}
+			else if (argc == 1) {
+				help_(NULL);
 			}
 			else {
-				help_command(NULL);
+				printf("Error: Invalid usage, see '/help' for details\n");
 			}
 		}
 		else if (cmpCmdString(argv[0], "/me")) {
