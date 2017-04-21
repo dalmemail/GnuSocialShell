@@ -155,6 +155,7 @@ int main(int argc, char **argv)
 	int vflag = _FALSE;
 	int hflag = _FALSE;
 	int fflag = _FALSE;
+	int verify_credentials = _TRUE;
 	int i;
 	for (i = 1; i < argc; i++) {
 		if ((strcmp(argv[i], "--version") == 0) || (strcmp(argv[i], "-v") == 0)) {
@@ -176,6 +177,9 @@ int main(int argc, char **argv)
 				fflag = _TRUE;
 			}
 		}
+		else if ((strcmp(argv[i], "--no-verify-account") == 0) || (strcmp(argv[i], "-nva") == 0)) {
+			verify_credentials = _FALSE;
+		}
 		else {
 			printf("%s: unrecognized option '%s'\n", argv[0], argv[i]);
 			printf("Try '%s --help' for more information\n", argv[0]);
@@ -190,7 +194,10 @@ int main(int argc, char **argv)
 	}
 	if (!vflag && !hflag && !fflag) {
 		if ((ret = loadConfig(config_path)) == ALL_OK) {
-			if (verify_account(main_account) != -1) {
+			if (!verify_credentials) {
+				gss_shell();
+			}
+			else if (verify_account(main_account) != -1) {
 				gss_shell();
 			}
 		}
@@ -206,11 +213,12 @@ void version()
 void help(char *prog)
 {
 	printf("Usage: %s [OPTION]\n", prog);
-	printf("--help, -h\t\tPrints this help\n");
-	printf("--debug, -d\t\tPrints extra debug messages\n");
-	printf("--version, -v\t\tPrints GnuSocialShell version\n");
-	printf("--config, -c [FILE]\tUse FILE as configuration file\n");
-	printf("\nWritten by DalmeGNU (dalmemail _AT_ amaya.tk)\n\n");
+	printf("--help, -h\t\t\tPrints this help\n");
+	printf("--debug, -d\t\t\tPrints extra debug messages\n");
+	printf("--version, -v\t\t\tPrints GnuSocialShell version\n");
+	printf("--config, -c [FILE]\t\tUse FILE as configuration file\n");
+	printf("--no-verify-account, -nva\tIf you use this option GnuSocialShell won't check if your credentials are correct\n");
+	printf("\nWritten by Daniel Martin (a.k.a DalmeGNU) (dalmemail _AT_ amaya.tk)\n\n");
 }
 
 static unsigned int parse(char *cmdline, char **argv, unsigned int maxArgv)
