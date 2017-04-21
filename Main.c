@@ -106,6 +106,7 @@ char *command_names[] = {
 	"/sub",
 	"/unsubscribe",
 	"/unsub",
+	"/user",
 	NULL
 };
 
@@ -387,6 +388,25 @@ int executeCommand(char *cmdline)
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmpCmdString(argv[0], "/user")) {
+			if (argc == 3) {
+				int n_status = atoi(argv[2]);
+				char user_timeline[96];
+				snprintf(user_timeline, 96, "statuses/friends_timeline.xml&screen_name=%s", argv[1]);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, user_timeline, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help user' for details\n");
 			}
 		}
 		else if (cmpCmdString(argv[0], "/rt") || cmpCmdString(argv[0], "/repeat")) {
