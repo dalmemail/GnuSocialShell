@@ -45,6 +45,7 @@ static char *commands[] = {
 	"groupdirectory",
 	"subscribe",
 	"unsubscribe",
+	"user",
 	NULL
 };
 
@@ -74,6 +75,7 @@ static char *cmdInfo[] = {
 	"/groupdirectory [NUMBER]\tThis will print you a specified number of public groups from your server",
 	"/subscribe [NICKNAME]\tThis will subscribe you to the user with the nickname specified (without the '@')\n\t\t\tAliases: /sub",
 	"/unsubscribe [NICKNAME]\tThis will unsubscribe you to the user with the nickname specified (without the '@')\n\t\t\tAliases: /unsub",
+	"/user [NICKNAME] [NUMBER]\tThis will print a number of states specified from a specific user's timeline (without the '@')",
 	NULL
 };
 
