@@ -46,6 +46,7 @@ static char *commands[] = {
 	"subscribe",
 	"unsubscribe",
 	"user",
+	"context",
 	NULL
 };
 
@@ -76,6 +77,7 @@ static char *cmdInfo[] = {
 	"/subscribe [NICKNAME]\tThis will subscribe you to the user with the nickname specified (without the '@')\n\t\t\tAliases: /sub",
 	"/unsubscribe [NICKNAME]\tThis will unsubscribe you to the user with the nickname specified (without the '@')\n\t\t\tAliases: /unsub",
 	"/user [NICKNAME] [NUMBER]\tThis will print a number of states specified from a specific user's timeline (without the '@')",
+	"/context [ID]\tThis will show the context of the state with the ID specified",
 	NULL
 };
 
