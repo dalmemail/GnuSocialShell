@@ -107,6 +107,7 @@ char *command_names[] = {
 	"/unsubscribe",
 	"/unsub",
 	"/user",
+	"/context",
 	NULL
 };
 
@@ -307,6 +308,7 @@ int executeCommand(char *cmdline)
 				if (!result) {
 					print_status(status_);
 				}
+				else printf("Error: Status with ID '%s' not found\n", argv[1]);
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
@@ -551,6 +553,27 @@ int executeCommand(char *cmdline)
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmpCmdString(argv[0], "/context")) {
+			if (argc == 2) {
+				int n_status = 0;
+				int sid = atoi(argv[1]);
+				struct status status_[5];
+				do {
+					status_[n_status] = search_by_id(main_account, sid, &result);
+					sid = status_[n_status].in_reply_to_id;
+					n_status++;
+				} while(n_status < 5 && status_[n_status-1].in_reply_to_id && !result);
+				if (n_status > 1 || !result) {
+					for (i = (n_status-1); i >= 0; i--) {
+						print_status(status_[i]);
+					}
+				}
+				else printf("Error: Status with ID '%s' not found\n", argv[1]);
+			}
+			else {
+				printf("Error: Invalid usage, see '/help context' for details\n");
 			}
 		}
 		else if (!cmpCmdString(argv[0], "/quit")) {
