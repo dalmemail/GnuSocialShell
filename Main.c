@@ -108,6 +108,7 @@ char *command_names[] = {
 	"/unsub",
 	"/user",
 	"/context",
+	"/tag",
 	NULL
 };
 
@@ -364,6 +365,25 @@ int executeCommand(char *cmdline)
 			}
 			else {
 				printf("Error: Invalid usage, see '/help' for details\n");
+			}
+		}
+		else if (cmpCmdString(argv[0], "/tag")) {
+			if (argc == 3) {
+				int n_status = atoi(argv[2]);
+				char tag_timeline[96];
+				snprintf(tag_timeline, 96, "statusnet/tags/timeline/%s.xml", argv[1]);
+				if (n_status > 0) {
+					struct status *status_list = read_timeline(main_account, tag_timeline, n_status);
+					for (i = 0; i < n_status; i++) {
+						if (status_list[i].id != 0) {
+							print_status(status_list[i]);
+						}
+					}
+					free(status_list);
+				}
+			}
+			else {
+				printf("Error: Invalid usage, see '/help tag' for details\n");
 			}
 		}
 		else if (cmpCmdString(argv[0], "/home") || cmpCmdString(argv[0], "/personal")) {
