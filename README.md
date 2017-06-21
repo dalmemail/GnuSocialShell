@@ -20,7 +20,7 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
       $ make
 
 #### Execute
-      $ ./gnusocialshell
+      $ ./gnusocialshell -c /path/to/config/file
 
 ### How to make a Configuration File
 
