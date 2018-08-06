@@ -17,9 +17,7 @@ GnuSocialShell is a simple, userful, text-based GnuSocial client write in C by D
 
 Before you start the compilation process please make sure you have the following tools installed on your system: gcc, autotools (autoconf & automake), gnulib.
 
-      $ touch config.rpath
-      $ autoreconf -iv
-      $ ./configure --prefix=/usr/local
+      $ ./autogen.sh --prefix=/usr/local
       $ make
 
 #### Execute
